@@ -58,9 +58,9 @@ export class UsersQueryRepository {
 
     return PaginatedViewDto.mapToView({
       items,
-      totalCount,
       page: query.pageNumber,
       size: query.pageSize,
+      totalCount,
     });
   }
 }
