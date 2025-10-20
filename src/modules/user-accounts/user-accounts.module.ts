@@ -6,6 +6,7 @@ import { User, UserSchema } from './domain/user.entity';
 import { UsersRepository } from './infrastructure/users.repository';
 import { BcryptService } from './application/bcrypt.service';
 import { UsersQueryRepository } from './infrastructure/users.query-repository';
+import { ExternalUsersQueryRepository } from './infrastructure/external-query/external-users-query.repository';
 
 @Module({
   imports: [
@@ -17,6 +18,8 @@ import { UsersQueryRepository } from './infrastructure/users.query-repository';
     BcryptService,
     UsersRepository,
     UsersQueryRepository,
+    ExternalUsersQueryRepository,
   ],
+  exports: [ExternalUsersQueryRepository],
 })
 export class UserAccountsModule {}

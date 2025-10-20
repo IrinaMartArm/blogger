@@ -5,12 +5,36 @@ import { BlogsQueryRepository } from './blogs/infrastructure/blogs.query-reposit
 import { BlogsRepository } from './blogs/infrastructure/blogs.repository';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Blog, BlogSchema } from './blogs/domain/blog.entity';
+import { PostsController } from './posts/api/posts.controller';
+import { PostLikesRepository } from './post-likes/post-likes.repository';
+import { PostsService } from './posts/application/posts.service';
+import { PostsRepository } from './posts/infrastructure/posts.repository';
+import { PostsQueryRepository } from './posts/infrastructure/posts-query.repository';
+import { UserAccountsModule } from '../user-accounts/user-accounts.module';
+import { Post, PostSchema } from './posts/domain/post.entity';
+import {
+  PostLike,
+  PostLikeSchema,
+} from './post-likes/domain/post-likes.entity';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Blog.name, schema: BlogSchema }]),
+    MongooseModule.forFeature([
+      { name: Blog.name, schema: BlogSchema },
+      { name: Post.name, schema: PostSchema },
+      { name: PostLike.name, schema: PostLikeSchema },
+    ]),
+    UserAccountsModule,
   ],
-  controllers: [BlogsController],
-  providers: [BlogsService, BlogsQueryRepository, BlogsRepository],
+  controllers: [BlogsController, PostsController],
+  providers: [
+    BlogsService,
+    PostsService,
+    BlogsQueryRepository,
+    PostsQueryRepository,
+    BlogsRepository,
+    PostsRepository,
+    PostLikesRepository,
+  ],
 })
 export class BloggerModule {}

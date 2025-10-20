@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Model } from 'mongoose';
+import mongoose, { HydratedDocument, Model } from 'mongoose';
 import {
   CreateBlogInputDto,
   UpdateBlogInputDto,
@@ -43,7 +43,7 @@ export class Blog {
   }
 
   makeDeleted() {
-    if (this.deletedAt !== null) {
+    if (this.deletedAt !== undefined) {
       // throw new Error('Entity already deleted');
       return;
     }
@@ -58,3 +58,5 @@ BlogSchema.loadClass(Blog);
 export type BlogDocument = HydratedDocument<Blog>;
 
 export type BlogModelType = Model<BlogDocument> & typeof Blog;
+
+export type BlogDbType = Blog & { _id: mongoose.Types.ObjectId };

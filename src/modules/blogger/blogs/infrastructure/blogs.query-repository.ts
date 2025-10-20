@@ -5,13 +5,22 @@ import { Blog, BlogModelType } from '../domain/blog.entity';
 import { GetBlogsQueryParams } from '../api/input-dto/get-blogs-query-params.input-dto';
 import { FilterQuery } from 'mongoose';
 import { PaginatedViewDto } from '../../../../core/dto/base.paginated.view-dto';
+import { PostViewDto } from '../../posts/api/view-dto/post.view-dto';
+import { PostsQueryRepository } from '../../posts/infrastructure/posts-query.repository';
+import { PostsQueryParams } from '../../posts/api/input-dto/posts.input-dto';
 
 @Injectable()
 export class BlogsQueryRepository {
-  constructor(@InjectModel(Blog.name) private BlogModel: BlogModelType) {}
+  constructor(
+    @InjectModel(Blog.name) private BlogModel: BlogModelType,
+    private postsQueryRepository: PostsQueryRepository,
+  ) {}
 
   async getBlogById(id: string): Promise<BlogViewDto> {
-    const blog = await this.BlogModel.findOne({ _id: id, deletedAt: null });
+    const blog = await this.BlogModel.findOne({
+      _id: id,
+      deletedAt: null,
+    }).lean();
 
     if (!blog) {
       throw new NotFoundException('blog not found');
@@ -32,7 +41,8 @@ export class BlogsQueryRepository {
     const blogs = await this.BlogModel.find(filter)
       .sort({ [query.sortBy]: query.sortDirection })
       .skip(query.calculateSkip())
-      .limit(query.pageSize);
+      .limit(query.pageSize)
+      .lean();
 
     const totalCount = await this.BlogModel.countDocuments(filter);
     const items = blogs.map((blog) => BlogViewDto.mapToView(blog));
@@ -42,5 +52,16 @@ export class BlogsQueryRepository {
       size: query.pageSize,
       totalCount,
     });
+  }
+
+  async findPosts(
+    blogId: string,
+    query: PostsQueryParams,
+  ): Promise<PaginatedViewDto<PostViewDto[]>> {
+    const blogExists = await this.BlogModel.exists({ _id: blogId });
+    if (!blogExists) {
+      throw new NotFoundException('blog not found');
+    }
+    return this.postsQueryRepository.findPosts(query, blogId);
   }
 }
