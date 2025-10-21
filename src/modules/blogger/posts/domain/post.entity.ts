@@ -22,12 +22,6 @@ export class Post {
   @Prop({ type: String, required: true })
   blogName: string;
 
-  // @Prop({ type: Number, required: true })
-  // likesCount: number;
-  //
-  // @Prop({ type: Number, required: true })
-  // dislikesCount: number;
-
   createdAt: Date;
   updatedAt: Date;
 
@@ -69,6 +63,10 @@ export class Post {
 export const PostSchema = SchemaFactory.createForClass(Post);
 
 PostSchema.loadClass(Post);
+
+PostSchema.index({ blogId: 1 });
+PostSchema.index({ deletedAt: 1 });
+PostSchema.index({ blogId: 1, createdAt: -1 });
 
 export type PostDocument = HydratedDocument<Post>;
 

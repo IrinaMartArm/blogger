@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Post,
   Put,
@@ -17,6 +19,8 @@ import {
 import { PostViewDto } from './view-dto/post.view-dto';
 import { PostsQueryRepository } from '../infrastructure/posts-query.repository';
 import { PaginatedViewDto } from '../../../../core/dto/base.paginated.view-dto';
+import { CommentsViewDto } from '../../comments/api/view-dto/comments.view-dto';
+import { GetCommentsQueryParams } from './input-dto/get-comments-query-params.input-dto';
 
 @Controller('posts')
 export class PostsController {
@@ -44,6 +48,7 @@ export class PostsController {
   }
 
   @Put('/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
   async updatePost(
     @Param('id') id: string,
     @Body() post: UpdatePostInputDto,
@@ -52,7 +57,16 @@ export class PostsController {
   }
 
   @Delete('/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
   async deletePost(@Param('id') id: string): Promise<void> {
     return this.postsService.deletePost(id);
+  }
+
+  @Get('/:id/comments')
+  async getPostComments(
+    @Param('id') id: string,
+    @Query() query: GetCommentsQueryParams,
+  ): Promise<PaginatedViewDto<CommentsViewDto[]>> {
+    return this.postsQueryRepository.getComments(id, query);
   }
 }

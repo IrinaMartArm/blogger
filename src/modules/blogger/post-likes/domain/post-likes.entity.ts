@@ -11,24 +11,15 @@ export class PostLike {
   postId: string;
 
   @Prop({ type: String, required: true })
-  login: string;
-
-  @Prop({ type: String, required: true })
   status: LikeStatusValue;
 
   createdAt: Date;
 
-  static create(
-    userId: string,
-    login: string,
-    postId: string,
-    status: LikeStatusValue,
-  ) {
+  static create(userId: string, postId: string, status: LikeStatusValue) {
     const like = new this();
 
     like.userId = userId;
     like.postId = postId;
-    like.login = login;
     like.status = status;
 
     return like as PostLikeDocument;

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserModelType } from '../domain/user.entity';
 import { CreateUserDto, UpdateUserDto } from '../dto/create-user.dto';
@@ -29,18 +29,26 @@ export class UsersService {
     return user._id.toString();
   }
 
-  async updateUser(id: string, dto: UpdateUserDto): Promise<string> {
-    const user = await this.usersRepository.findOrNotFoundFail(id);
-
-    user.update(dto);
-
-    await this.usersRepository.save(user);
-
-    return user._id.toString();
-  }
+  // async updateUser(id: string, dto: UpdateUserDto): Promise<string> {
+  //   const user = await this.usersRepository.find(id);
+  //
+  //   if (!user) {
+  //     throw new NotFoundException('user not found');
+  //   }
+  //
+  //   user.update(dto);
+  //
+  //   await this.usersRepository.save(user);
+  //
+  //   return user._id.toString();
+  // }
 
   async deleteUser(id: string) {
-    const user = await this.usersRepository.findOrNotFoundFail(id);
+    const user = await this.usersRepository.find(id);
+
+    if (!user) {
+      throw new NotFoundException('user not found');
+    }
 
     user.makeDeleted();
 

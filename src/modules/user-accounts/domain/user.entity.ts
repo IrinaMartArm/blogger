@@ -44,6 +44,7 @@ export class User {
     user.passwordHash = dto.passwordHash;
     user.login = dto.login;
     user.isEmailConfirmed = false; // пользователь ВСЕГДА должен после регистрации подтверждить свой Email
+    user.deletedAt = null;
 
     user.name = {
       firstName: 'firstName xxx',
@@ -53,13 +54,8 @@ export class User {
     return user as UserDocument;
   }
 
-  /**
-   * Marks the user as deleted
-   * Throws an error if already deleted
-   * @throws {Error} If the entity is already deleted
-   * DDD continue: инкапсуляция (вызываем методы, которые меняют состояние\св-ва) объектов согласно правилам этого объекта
-   */
   makeDeleted() {
+    console.log('this.deletedAt', this.deletedAt);
     if (this.deletedAt !== null) {
       return;
       // throw new Error('Entity already deleted');

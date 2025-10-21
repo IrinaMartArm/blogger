@@ -6,7 +6,7 @@ import { BlogsRepository } from './blogs/infrastructure/blogs.repository';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Blog, BlogSchema } from './blogs/domain/blog.entity';
 import { PostsController } from './posts/api/posts.controller';
-import { PostLikesRepository } from './post-likes/post-likes.repository';
+import { PostLikesQueryRepository } from './post-likes/infrastructure/post-likes.query-repository';
 import { PostsService } from './posts/application/posts.service';
 import { PostsRepository } from './posts/infrastructure/posts.repository';
 import { PostsQueryRepository } from './posts/infrastructure/posts-query.repository';
@@ -16,25 +16,37 @@ import {
   PostLike,
   PostLikeSchema,
 } from './post-likes/domain/post-likes.entity';
+import { CommentsController } from './comments/api/comments.controller';
+import { CommentsQueryRepository } from './comments/infrastructure/comments.query-repository';
+import { CommentLikesQueryRepository } from './comment-likes/infrastructure/comment-likes.repository';
+import {
+  CommentLike,
+  CommentLikeSchema,
+} from './comment-likes/domain/comment-like.entity';
+import { Comment, CommentSchema } from './comments/domain/comment.entity';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: Blog.name, schema: BlogSchema },
       { name: Post.name, schema: PostSchema },
+      { name: Comment.name, schema: CommentSchema },
       { name: PostLike.name, schema: PostLikeSchema },
+      { name: CommentLike.name, schema: CommentLikeSchema },
     ]),
     UserAccountsModule,
   ],
-  controllers: [BlogsController, PostsController],
+  controllers: [BlogsController, PostsController, CommentsController],
   providers: [
     BlogsService,
     PostsService,
     BlogsQueryRepository,
     PostsQueryRepository,
+    CommentsQueryRepository,
+    CommentLikesQueryRepository,
     BlogsRepository,
     PostsRepository,
-    PostLikesRepository,
+    PostLikesQueryRepository,
   ],
 })
 export class BloggerModule {}

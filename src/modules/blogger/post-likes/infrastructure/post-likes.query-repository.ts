@@ -3,20 +3,20 @@ import {
   PostLike,
   PostLikeDocument,
   PostLikeModelType,
-} from './domain/post-likes.entity';
+} from '../domain/post-likes.entity';
 import { InjectModel } from '@nestjs/mongoose';
 import {
   ExtendedLikesInfo,
   NewestLikes,
   NewestLikesDb,
-} from '../posts/api/view-dto/post.view-dto';
-import { LikeStatusValue } from './dto';
-import { ExternalUsersQueryRepository } from '../../user-accounts/infrastructure/external-query/external-users-query.repository';
+} from '../../posts/api/view-dto/post.view-dto';
+import { LikeStatusValue } from '../dto';
+import { ExternalUsersQueryRepository } from '../../../user-accounts/infrastructure/external-query/external-users-query.repository';
 import mongoose from 'mongoose';
-import { GetPostsResult } from '../posts/dto';
+import { GetPostsResult } from '../../posts/dto';
 
 @Injectable()
-export class PostLikesRepository {
+export class PostLikesQueryRepository {
   constructor(
     @InjectModel(PostLike.name) private postLikeModel: PostLikeModelType,
     private usersQueryRepository: ExternalUsersQueryRepository,

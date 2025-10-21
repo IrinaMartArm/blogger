@@ -43,7 +43,7 @@ export class Blog {
   }
 
   makeDeleted() {
-    if (this.deletedAt !== undefined) {
+    if (this.deletedAt !== null) {
       // throw new Error('Entity already deleted');
       return;
     }

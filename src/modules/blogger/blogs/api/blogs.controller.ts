@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Post,
   Put,
@@ -49,6 +51,7 @@ export class BlogsController {
   }
 
   @Put('/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
   async updateBlog(
     @Param('id') id: string,
     @Body() body: UpdateBlogInputDto,
@@ -57,6 +60,7 @@ export class BlogsController {
   }
 
   @Delete('/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
   async deleteBlog(@Param('id') id: string): Promise<void> {
     return this.blogsService.deleteBlog(id);
   }

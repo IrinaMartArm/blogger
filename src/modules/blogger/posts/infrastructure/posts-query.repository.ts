@@ -2,11 +2,14 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Post, PostModelType } from '../domain/post.entity';
 import { ExtendedLikesInfo, PostViewDto } from '../api/view-dto/post.view-dto';
-import { PostLikesRepository } from '../../post-likes/post-likes.repository';
+import { PostLikesQueryRepository } from '../../post-likes/infrastructure/post-likes.query-repository';
 import { PaginatedViewDto } from '../../../../core/dto/base.paginated.view-dto';
 import { FilterQuery } from 'mongoose';
 import { PostsQueryParams } from '../api/input-dto/posts.input-dto';
 import { LikeStatusValue } from '../../post-likes/dto';
+import { CommentsViewDto } from '../../comments/api/view-dto/comments.view-dto';
+import { CommentsQueryRepository } from '../../comments/infrastructure/comments.query-repository';
+import { GetCommentsQueryParams } from '../api/input-dto/get-comments-query-params.input-dto';
 
 const defaultLikesInfo: ExtendedLikesInfo = {
   likesCount: 0,
@@ -19,7 +22,8 @@ const defaultLikesInfo: ExtendedLikesInfo = {
 export class PostsQueryRepository {
   constructor(
     @InjectModel(Post.name) private postModel: PostModelType,
-    private postLikesRepository: PostLikesRepository,
+    private postLikesRepository: PostLikesQueryRepository,
+    private commentsQueryRepository: CommentsQueryRepository,
   ) {}
   async findPost(postId: string, userId?: string): Promise<PostViewDto> {
     const post = await this.postModel
@@ -78,5 +82,16 @@ export class PostsQueryRepository {
       size: query.pageSize,
       totalCount,
     });
+  }
+
+  async getComments(
+    postId: string,
+    query: GetCommentsQueryParams,
+  ): Promise<PaginatedViewDto<CommentsViewDto[]>> {
+    const post = await this.postModel.exists({ _id: postId, deletedAt: null });
+    if (!post) {
+      throw new NotFoundException('Post not found');
+    }
+    return this.commentsQueryRepository.getCommentsForPost(postId, query);
   }
 }

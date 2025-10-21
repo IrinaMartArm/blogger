@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   HttpCode,
+  HttpStatus,
   Param,
   Post,
   Query,
@@ -22,7 +23,7 @@ export class UsersController {
     private usersService: UsersService,
   ) {}
 
-  @Get(':id')
+  @Get('/:id')
   async getById(@Param('id') id: string): Promise<UserViewDto> {
     return this.usersQueryRepository.getByIdOrNotFoundFail(id);
   }
@@ -37,13 +38,18 @@ export class UsersController {
   @Post()
   async createUser(@Body() body: CreateUserInputDto): Promise<UserViewDto> {
     const userId = await this.usersService.createUser(body);
+    console.log('userId', userId);
 
-    return this.usersQueryRepository.getByIdOrNotFoundFail(userId);
+    const userById =
+      await this.usersQueryRepository.getByIdOrNotFoundFail(userId);
+    console.log('userById', userById);
+    return userById;
   }
 
-  @Delete(':id')
-  // @HttpCode(HttpStatus.NO_CONTENT)
+  @Delete('/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
   async deleteUser(@Param('id') id: string): Promise<void> {
+    //todo mongoValidator
     return this.usersService.deleteUser(id);
   }
 }

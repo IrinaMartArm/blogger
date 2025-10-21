@@ -38,7 +38,9 @@ export class BlogsService {
     }
     blog.makeDeleted();
 
-    await this.blogRepository.save(blog);
+    console.log(blog.deletedAt);
+
+    return this.blogRepository.save(blog);
   }
 
   async createPostForBlog(blogId: string, body: CreatePostByBlogIdInputDto) {
