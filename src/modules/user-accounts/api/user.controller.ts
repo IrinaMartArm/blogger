@@ -32,6 +32,7 @@ export class UsersController {
   async getAll(
     @Query() query: GetUsersQueryParams,
   ): Promise<PaginatedViewDto<UserViewDto[]>> {
+    console.log('getAll');
     return this.usersQueryRepository.getAll(query);
   }
 
@@ -50,6 +51,7 @@ export class UsersController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteUser(@Param('id') id: string): Promise<void> {
     //todo mongoValidator
+    console.log('deleteUser');
     return this.usersService.deleteUser(id);
   }
 }
