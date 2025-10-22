@@ -33,8 +33,6 @@ export class UsersQueryRepository {
       deletedAt: null,
     };
 
-    console.log('query', query);
-
     if (query.searchLoginTerm) {
       filter.$or = filter.$or || [];
       filter.$or.push({
@@ -49,8 +47,6 @@ export class UsersQueryRepository {
       });
     }
 
-    console.log('filter', filter);
-
     const users = await this.UserModel.find(filter)
       .sort({ [query.sortBy]: query.sortDirection })
       .skip(query.calculateSkip())
@@ -59,8 +55,6 @@ export class UsersQueryRepository {
     const totalCount = await this.UserModel.countDocuments(filter);
 
     const items = users.map((user) => UserViewDto.mapToView(user));
-
-    console.log('items', items.length);
 
     return PaginatedViewDto.mapToView({
       items,
