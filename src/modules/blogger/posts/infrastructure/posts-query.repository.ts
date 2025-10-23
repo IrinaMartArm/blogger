@@ -4,7 +4,7 @@ import { Post, PostModelType } from '../domain/post.entity';
 import { ExtendedLikesInfo, PostViewDto } from '../api/view-dto/post.view-dto';
 import { PostLikesQueryRepository } from '../../post-likes/infrastructure/post-likes.query-repository';
 import { PaginatedViewDto } from '../../../../core/dto/base.paginated.view-dto';
-import { FilterQuery } from 'mongoose';
+import { FilterQuery, SortOrder } from 'mongoose';
 import { PostsQueryParams } from '../api/input-dto/posts.input-dto';
 import { LikeStatusValue } from '../../post-likes/dto';
 import { CommentsViewDto } from '../../comments/api/view-dto/comments.view-dto';
@@ -56,7 +56,7 @@ export class PostsQueryRepository {
 
     const posts = await this.postModel
       .find(filter)
-      .sort({ [query.sortBy]: query.sortDirection })
+      .sort({ [query.sortBy]: query.sortDirection as SortOrder })
       .skip(query.calculateSkip())
       .limit(query.pageSize)
       .lean();

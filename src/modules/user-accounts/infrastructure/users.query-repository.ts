@@ -3,8 +3,9 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { UserViewDto } from '../api/view-dto/user.view-dto';
 import { GetUsersQueryParams } from '../api/input-dto/get-users-query-params.input-dto';
-import { FilterQuery } from 'mongoose';
+import { FilterQuery, Types } from 'mongoose';
 import { PaginatedViewDto } from '../../../core/dto/base.paginated.view-dto';
+import { SortOrder } from 'mongoose';
 
 @Injectable()
 export class UsersQueryRepository {
@@ -13,7 +14,7 @@ export class UsersQueryRepository {
     private UserModel: UserModelType,
   ) {}
 
-  async getByIdOrNotFoundFail(id: string): Promise<UserViewDto> {
+  async getByIdOrNotFoundFail(id: Types.ObjectId): Promise<UserViewDto> {
     const user = await this.UserModel.findOne({
       _id: id,
       deletedAt: null,
@@ -48,7 +49,7 @@ export class UsersQueryRepository {
     }
 
     const users = await this.UserModel.find(filter)
-      .sort({ [query.sortBy]: query.sortDirection })
+      .sort({ [query.sortBy]: query.sortDirection as SortOrder })
       .skip(query.calculateSkip())
       .limit(query.pageSize);
 

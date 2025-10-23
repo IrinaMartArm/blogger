@@ -1,11 +1,19 @@
-import { Type } from 'class-transformer';
+import { Transform } from 'class-transformer';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class BaseQueryParams {
-  @Type(() => Number)
-  pageNumber: number = 1;
-  @Type(() => Number)
-  pageSize: number = 10;
-  sortDirection: SortDirection = SortDirection.Desc;
+  @IsOptional()
+  @Transform(({ value }) => Number(value))
+  @IsNumber()
+  public readonly pageNumber: number = 1;
+
+  @IsOptional()
+  @Transform(({ value }) => Number(value))
+  @IsNumber()
+  public readonly pageSize: number = 10;
+
+  @IsString()
+  public readonly sortDirection: string = 'desc';
 
   calculateSkip() {
     return (this.pageNumber - 1) * this.pageSize;

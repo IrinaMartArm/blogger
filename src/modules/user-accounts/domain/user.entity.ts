@@ -6,17 +6,26 @@ import { Name, NameSchema } from './name.schema';
 
 @Schema({ timestamps: true })
 export class User {
-  @Prop({ type: String, required: true })
+  @Prop({ type: String, required: true, unique: true })
   login: string;
 
   @Prop({ type: String, required: true })
   passwordHash: string;
 
-  @Prop({ type: String, required: true })
+  @Prop({ type: String, required: true, unique: true })
   email: string;
 
   @Prop({ type: Boolean, required: true, default: false })
   isEmailConfirmed: boolean;
+
+  @Prop({ type: String, default: null })
+  confirmationCode: string | null;
+
+  @Prop({ type: Date, default: null })
+  expirationDate: Date | null;
+
+  @Prop({ type: Boolean, default: false })
+  isPasswordRecoveryActive: boolean;
 
   // @Prop(NameSchema) this variant from doc. doesn't make validation for inner object
   @Prop({ type: NameSchema })
@@ -45,6 +54,9 @@ export class User {
     user.login = dto.login;
     user.isEmailConfirmed = false; // пользователь ВСЕГДА должен после регистрации подтверждить свой Email
     user.deletedAt = null;
+    user.confirmationCode = null;
+    user.expirationDate = null;
+    user.isPasswordRecoveryActive = false;
 
     user.name = {
       firstName: 'firstName xxx',

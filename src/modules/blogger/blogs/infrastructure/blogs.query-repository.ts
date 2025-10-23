@@ -3,7 +3,7 @@ import { BlogViewDto } from '../api/view-dto/blog.view-dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Blog, BlogModelType } from '../domain/blog.entity';
 import { GetBlogsQueryParams } from '../api/input-dto/get-blogs-query-params.input-dto';
-import { FilterQuery } from 'mongoose';
+import { FilterQuery, SortOrder } from 'mongoose';
 import { PaginatedViewDto } from '../../../../core/dto/base.paginated.view-dto';
 import { PostViewDto } from '../../posts/api/view-dto/post.view-dto';
 import { PostsQueryRepository } from '../../posts/infrastructure/posts-query.repository';
@@ -39,7 +39,7 @@ export class BlogsQueryRepository {
     }
 
     const blogs = await this.BlogModel.find(filter)
-      .sort({ [query.sortBy]: query.sortDirection })
+      .sort({ [query.sortBy]: query.sortDirection as SortOrder })
       .skip(query.calculateSkip())
       .limit(query.pageSize)
       .lean();

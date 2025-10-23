@@ -10,12 +10,21 @@ import { ExternalUsersQueryRepository } from './infrastructure/external-query/ex
 import { JwtStrategy } from './guards/bearer/jwt.strategy';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
+import { LocalStrategy } from './guards/local/local.strategy';
+import { AuthController } from './api/auth.controller';
+import { AuthService } from './application/auth.service';
+import { NotificationsModule } from '../notifications/notifications.module';
+import { EmailService } from '../notifications/email.service';
+import { APP_FILTER } from '@nestjs/core';
+import { AllHttpExceptionsFilter } from '../../core/filters/all-exceptions-filter';
+import { DomainHttpExceptionsFilter } from '../../core/filters/domain-exception-filter';
 // import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     PassportModule,
+    NotificationsModule,
     //NestJS предоставляет модуль JwtModule (из пакета @nestjs/jwt), который нужен, чтобы:
     // создавать токены (this.jwtService.sign(payload));
     // проверять токены
@@ -37,14 +46,25 @@ import { JwtModule } from '@nestjs/jwt';
     // и результат этой функции — объект настроек для JwtModule.
     // }),
   ],
-  controllers: [UsersController],
+  controllers: [UsersController, AuthController],
   providers: [
     UsersService,
     BcryptService,
+    AuthService,
+    EmailService,
     UsersRepository,
     UsersQueryRepository,
     ExternalUsersQueryRepository,
     JwtStrategy,
+    LocalStrategy,
+    // {
+    //   provide: APP_FILTER,
+    //   useClass: AllHttpExceptionsFilter,
+    // },
+    // {
+    //   provide: APP_FILTER,
+    //   useClass: DomainHttpExceptionsFilter,
+    // },
   ],
   exports: [ExternalUsersQueryRepository],
 })
