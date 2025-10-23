@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+// import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserAccountsModule } from './modules/user-accounts/user-accounts.module';
@@ -16,6 +17,7 @@ import { DomainHttpExceptionsFilter } from './core/filters/domain-exception-filt
     UserAccountsModule,
     BloggerModule,
     TestingModule,
+    // ConfigModule.forRoot({ isGlobal: true }), // .env доступен глобально
   ],
   controllers: [AppController],
   providers: [

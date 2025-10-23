@@ -8,4 +8,5 @@ export const SETTINGS = {
   DB_NAME: process.env.DB_NAME || 'lessons',
   EMAIL: process.env.MY_EMAIL,
   PASS: process.env.MY_PASS,
+  JWT_ACCESS_SECRET: process.env.JWT_ACCESS_SECRET,
 };
