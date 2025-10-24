@@ -10,6 +10,7 @@ import { SETTINGS } from '../../settings';
         host: 'smtp.gmail.com', //адрес SMTP сервера
         port: 587,
         secure: false,
+        requireTLS: true,
         auth: {
           user: SETTINGS.EMAIL,
           pass: SETTINGS.PASS,

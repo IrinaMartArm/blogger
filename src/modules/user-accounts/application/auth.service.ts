@@ -23,7 +23,7 @@ export class AuthService {
     const user = await this.validateUser(body.loginOrEmail, body.password);
 
     const accessToken = this.jwtService.sign(
-      { userId: user.userId },
+      { userId: user.currentUserId },
       { secret: SETTINGS.JWT_ACCESS_SECRET },
     );
 
@@ -84,7 +84,7 @@ export class AuthService {
         message: 'Invalid login or password',
       });
     }
-    return { userId: user._id.toString() };
+    return { currentUserId: user._id.toString() };
   }
 
   async passwordRecovery(email: string) {
@@ -113,7 +113,7 @@ export class AuthService {
     await this.usersRepository.save(user);
 
     try {
-      this.emailService.sendRecoveryEmail(user.email, code);
+      await this.emailService.sendRecoveryEmail(user.email, code);
     } catch (e: unknown) {
       console.log('ERROR', e);
       // await usersRepository.deleteUser(userId);

@@ -61,7 +61,6 @@ export class UsersService {
 
     const user = await this.usersRepository.findById(userId);
 
-    console.log('UsersService registration, user', user);
     if (!user) {
       throw new DomainException({
         code: DomainExceptionCode.InternalServerError,

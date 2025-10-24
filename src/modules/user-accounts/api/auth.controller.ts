@@ -18,12 +18,14 @@ import { AuthService } from '../application/auth.service';
 import { GetUserFromRequest } from '../decorators/param/getUserFromRequest';
 import { UserContextDto } from '../dto/user-context.dto';
 import { JwtAuthGuard } from '../guards/bearer/jwt-auth.guard';
+import { AuthQueryRepository } from '../infrastructure/query/auth.query-repository';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly usersService: UsersService,
+    private readonly authQueryRepository: AuthQueryRepository,
   ) {}
 
   @Post('registration')
@@ -41,7 +43,7 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Get('me')
   getProfile(@GetUserFromRequest() user: UserContextDto) {
-    return user;
+    return this.authQueryRepository.me(user.currentUserId);
   }
 
   @Post('registration-confirmation')

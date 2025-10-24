@@ -18,7 +18,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   }
 
   async validate(payload: UserContextDto): Promise<UserContextDto> {
-    const user = await this.userRepo.findById(payload.userId);
+    const user = await this.userRepo.findById(payload.currentUserId);
 
     if (!user) {
       throw new DomainException({
@@ -28,9 +28,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     }
 
     return {
-      userId: user?._id.toString(),
-      email: user.email,
-      login: user.login,
+      currentUserId: user?._id.toString(),
     };
   }
 }

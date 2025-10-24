@@ -5,7 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from './domain/user.entity';
 import { UsersRepository } from './infrastructure/users.repository';
 import { BcryptService } from './application/bcrypt.service';
-import { UsersQueryRepository } from './infrastructure/users.query-repository';
+import { UsersQueryRepository } from './infrastructure/query/users.query-repository';
 import { ExternalUsersQueryRepository } from './infrastructure/external-query/external-users-query.repository';
 import { JwtStrategy } from './guards/bearer/jwt.strategy';
 import { PassportModule } from '@nestjs/passport';
@@ -15,9 +15,7 @@ import { AuthController } from './api/auth.controller';
 import { AuthService } from './application/auth.service';
 import { NotificationsModule } from '../notifications/notifications.module';
 import { EmailService } from '../notifications/email.service';
-import { APP_FILTER } from '@nestjs/core';
-import { AllHttpExceptionsFilter } from '../../core/filters/all-exceptions-filter';
-import { DomainHttpExceptionsFilter } from '../../core/filters/domain-exception-filter';
+import { AuthQueryRepository } from './infrastructure/query/auth.query-repository';
 // import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
@@ -54,6 +52,7 @@ import { DomainHttpExceptionsFilter } from '../../core/filters/domain-exception-
     EmailService,
     UsersRepository,
     UsersQueryRepository,
+    AuthQueryRepository,
     ExternalUsersQueryRepository,
     JwtStrategy,
     LocalStrategy,
