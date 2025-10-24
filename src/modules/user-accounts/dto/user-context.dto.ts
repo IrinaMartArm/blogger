@@ -1,5 +1,5 @@
 export class UserContextDto {
-  id: string;
+  userId: string;
   email?: string;
   login?: string;
 }

@@ -3,17 +3,19 @@ import { Prop, SchemaFactory, Schema } from '@nestjs/mongoose';
 import { CreateUserDomainDto } from './dto/create-user.domain.dto';
 import { UpdateUserDto } from '../dto/create-user.dto';
 import { Name, NameSchema } from './name.schema';
+import { randomUUID } from 'node:crypto';
+import { add } from 'date-fns';
 
 @Schema({ timestamps: true })
 export class User {
-  @Prop({ type: String, required: true, unique: true })
+  @Prop({ type: String, required: true, unique: true, index: true })
   login: string;
+
+  @Prop({ type: String, required: true, unique: true, index: true })
+  email: string;
 
   @Prop({ type: String, required: true })
   passwordHash: string;
-
-  @Prop({ type: String, required: true, unique: true })
-  email: string;
 
   @Prop({ type: Boolean, required: true, default: false })
   isEmailConfirmed: boolean;
@@ -54,6 +56,8 @@ export class User {
     user.login = dto.login;
     user.isEmailConfirmed = false; // пользователь ВСЕГДА должен после регистрации подтверждить свой Email
     user.deletedAt = null;
+    // user.confirmationCode = randomUUID();
+    // user.expirationDate = add(new Date(), { hours: 1, minutes: 30 });
     user.confirmationCode = null;
     user.expirationDate = null;
     user.isPasswordRecoveryActive = false;
@@ -67,7 +71,6 @@ export class User {
   }
 
   makeDeleted() {
-    console.log('this.deletedAt', this.deletedAt);
     if (this.deletedAt !== null) {
       return;
       // throw new Error('Entity already deleted');
@@ -86,6 +89,62 @@ export class User {
       this.isEmailConfirmed = false;
     }
     this.email = dto.email;
+  }
+
+  changePassword(newPassword: string) {
+    this.confirmationCode = null;
+    this.expirationDate = null;
+    this.isPasswordRecoveryActive = false;
+    this.passwordHash = newPassword;
+  }
+
+  canChangePassword(code: string) {
+    return !(
+      !this.confirmationCode ||
+      this.confirmationCode !== code ||
+      !this.expirationDate ||
+      this.expirationDate < new Date()
+    );
+  }
+
+  confirmEmail(code: string) {
+    const isCanConfirm = this.canConfirmEmail(code);
+
+    if (isCanConfirm) {
+      this.clearConfirmationCode();
+      return true;
+    }
+    return false;
+  }
+
+  canConfirmEmail(code: string): boolean {
+    return (
+      !this.isEmailConfirmed &&
+      this.confirmationCode === code &&
+      (!this.expirationDate || this.expirationDate >= new Date())
+    );
+  }
+
+  setConfirmationCode(passwordRecovery?: boolean) {
+    if (this.isEmailConfirmed && !passwordRecovery) {
+      return;
+    }
+    if (passwordRecovery) {
+      this.isPasswordRecoveryActive = true;
+    }
+    const code = randomUUID();
+
+    this.confirmationCode = code;
+    this.expirationDate = add(new Date(), { hours: 1, minutes: 30 });
+    this.isEmailConfirmed = false;
+
+    return code;
+  }
+
+  clearConfirmationCode(): void {
+    this.isEmailConfirmed = true;
+    this.confirmationCode = null;
+    this.expirationDate = null;
   }
 }
 

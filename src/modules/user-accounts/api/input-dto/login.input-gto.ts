@@ -7,3 +7,8 @@ export class LoginInputDto {
   @IsString()
   password: string;
 }
+
+export class ConfirmCodeDto {
+  @IsString()
+  code: string;
+}

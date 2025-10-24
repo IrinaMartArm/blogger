@@ -18,6 +18,7 @@ import { UsersService } from '../application/user.service';
 import { PaginatedViewDto } from '../../../core/dto/base.paginated.view-dto';
 import { Types } from 'mongoose';
 import { BasicAuthGuard } from '../guards/basic/basic-auth.guard';
+import { ObjectIdValidationPipe } from '../../../core/pipes/objectId-validation.pipe';
 
 @UseGuards(BasicAuthGuard)
 @Controller('users')
@@ -28,7 +29,9 @@ export class UsersController {
   ) {}
 
   @Get('/:id')
-  async getById(@Param('id') id: Types.ObjectId): Promise<UserViewDto> {
+  async getById(
+    @Param('id', ObjectIdValidationPipe) id: Types.ObjectId,
+  ): Promise<UserViewDto> {
     return this.usersQueryRepository.getByIdOrNotFoundFail(id);
   }
 
@@ -48,9 +51,9 @@ export class UsersController {
 
   @Delete('/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteUser(@Param('id') id: Types.ObjectId): Promise<void> {
-    //todo mongoValidator
-
+  async deleteUser(
+    @Param('id', ObjectIdValidationPipe) id: Types.ObjectId,
+  ): Promise<void> {
     return this.usersService.deleteUser(id);
   }
 }

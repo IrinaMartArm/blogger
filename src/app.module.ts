@@ -24,6 +24,18 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
   controllers: [AppController],
   providers: [
     AppService,
+    // {
+    //   provide: APP_FILTER,
+    //   useFactory: () => {
+    //     return new DomainHttpExceptionsFilter();
+    //   },
+    // },
+    // {
+    //   provide: APP_FILTER,
+    //   useFactory: () => {
+    //     return new AllHttpExceptionsFilter();
+    //   },
+    // },
     {
       provide: APP_FILTER,
       useClass: AllHttpExceptionsFilter,

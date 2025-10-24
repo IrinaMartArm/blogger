@@ -17,3 +17,18 @@ export class CreateUserInputDto implements CreateUserDto {
   @Trim()
   email: string;
 }
+
+export class CheckEmailDto {
+  @IsString()
+  @IsEmail()
+  @Trim()
+  email: string;
+}
+
+export class NewPasswordInputDto {
+  @IsStringWithTrim(passwordConst.min, passwordConst.max)
+  newPassword: string;
+
+  @IsString()
+  recoveryCode: string;
+}

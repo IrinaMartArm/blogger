@@ -3,10 +3,13 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { UserContextDto } from '../../dto/user-context.dto';
 import { SETTINGS } from '../../../../settings';
+import { UsersRepository } from '../../infrastructure/users.repository';
+import { DomainException } from '../../../../core/exceptions/domain-exception';
+import { DomainExceptionCode } from '../../../../core/exceptions/domain-exception-codes';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
-  constructor() {
+  constructor(private readonly userRepo: UsersRepository) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
@@ -14,7 +17,20 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     });
   }
 
-  validate(payload: UserContextDto): UserContextDto {
-    return payload;
+  async validate(payload: UserContextDto): Promise<UserContextDto> {
+    const user = await this.userRepo.findById(payload.userId);
+
+    if (!user) {
+      throw new DomainException({
+        code: DomainExceptionCode.Unauthorized,
+        message: 'unauthorized',
+      });
+    }
+
+    return {
+      userId: user?._id.toString(),
+      email: user.email,
+      login: user.login,
+    };
   }
 }

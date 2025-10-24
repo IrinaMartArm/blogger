@@ -5,7 +5,7 @@ import {
   ExceptionFilter,
   HttpStatus,
 } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { DomainExceptionCode } from '../exceptions/domain-exception-codes';
 import { ErrorResponseBodyType } from './errorResponseBodyType';
 
@@ -14,10 +14,10 @@ export class DomainHttpExceptionsFilter implements ExceptionFilter {
   catch(exception: DomainException, host: ArgumentsHost): void {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
-    const request = ctx.getRequest<Request>();
+    // const request = ctx.getRequest<Request>();
 
     const status = this.mapToHttpStatus(exception.code);
-    const responseBody = this.buildResponseBody(exception, request.url);
+    const responseBody = this.buildResponseBody(exception);
 
     response.status(status).json(responseBody);
   }
@@ -45,14 +45,14 @@ export class DomainHttpExceptionsFilter implements ExceptionFilter {
 
   private buildResponseBody(
     exception: DomainException,
-    requestUrl: string,
+    // requestUrl: string,
   ): ErrorResponseBodyType {
     return {
-      timestamp: new Date().toISOString(),
-      path: requestUrl,
-      message: exception.message,
-      code: exception.code,
-      extensions: exception.extensions,
+      // timestamp: new Date().toISOString(),
+      // path: requestUrl,
+      // message: exception.message,
+      // code: exception.code,
+      errorsMessages: exception.extensions,
     };
   }
 }

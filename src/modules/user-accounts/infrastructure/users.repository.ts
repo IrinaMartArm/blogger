@@ -7,7 +7,7 @@ import { Types } from 'mongoose';
 export class UsersRepository {
   constructor(@InjectModel(User.name) private UserModel: UserModelType) {}
 
-  async findById(id: Types.ObjectId): Promise<UserDocument | null> {
+  async findById(id: Types.ObjectId | string): Promise<UserDocument | null> {
     return this.UserModel.findOne({
       _id: id,
       deletedAt: null,
@@ -18,7 +18,20 @@ export class UsersRepository {
     await user.save();
   }
 
-  async find(login: string): Promise<UserDocument | null> {
-    return this.UserModel.findOne({ login });
+  async find(loginOrEmail: string): Promise<UserDocument | null> {
+    return this.UserModel.findOne({
+      $or: [
+        { email: loginOrEmail, deletedAt: null },
+        { login: loginOrEmail, deletedAt: null },
+      ],
+    });
+  }
+
+  async findByConfirmationCode(code: string): Promise<UserDocument | null> {
+    return this.UserModel.findOne({
+      confirmationCode: code,
+      deletedAt: null,
+      // isEmailConfirmed: false,
+    });
   }
 }

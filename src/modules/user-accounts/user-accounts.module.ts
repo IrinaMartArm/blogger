@@ -57,14 +57,6 @@ import { DomainHttpExceptionsFilter } from '../../core/filters/domain-exception-
     ExternalUsersQueryRepository,
     JwtStrategy,
     LocalStrategy,
-    // {
-    //   provide: APP_FILTER,
-    //   useClass: AllHttpExceptionsFilter,
-    // },
-    // {
-    //   provide: APP_FILTER,
-    //   useClass: DomainHttpExceptionsFilter,
-    // },
   ],
   exports: [ExternalUsersQueryRepository],
 })
