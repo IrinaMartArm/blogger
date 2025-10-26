@@ -11,10 +11,12 @@ import { APP_FILTER } from '@nestjs/core';
 import { AllHttpExceptionsFilter } from './core/filters/all-exceptions-filter';
 import { DomainHttpExceptionsFilter } from './core/filters/domain-exception-filter';
 import { NotificationsModule } from './modules/notifications/notifications.module';
+import { CqrsModule } from '@nestjs/cqrs';
 
 @Module({
   imports: [
     MongooseModule.forRoot(SETTINGS.MONGO_URL),
+    CqrsModule.forRoot(),
     UserAccountsModule,
     BloggerModule,
     TestingModule,

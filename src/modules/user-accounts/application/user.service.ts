@@ -34,66 +34,6 @@ export class UsersService {
     return user._id;
   }
 
-  async registration(dto: CreateUserDto): Promise<void> {
-    const existingByEmail = await this.usersRepository.find(dto.email);
-    console.log('UsersService registration');
-    if (existingByEmail) {
-      throw new DomainException({
-        code: DomainExceptionCode.BadRequest,
-        message: 'User already exists',
-        extensions: [{ message: 'User already exists', field: 'email' }],
-      });
-    }
-
-    const existingByLogin = await this.usersRepository.find(dto.login);
-
-    if (existingByLogin) {
-      throw new DomainException({
-        code: DomainExceptionCode.BadRequest,
-        message: 'User already exists',
-        extensions: [{ message: 'User already exists', field: 'login' }],
-      });
-    }
-
-    const userId = await this.createUser(dto);
-
-    console.log('UsersService registration, userId', userId);
-
-    const user = await this.usersRepository.findById(userId);
-
-    if (!user) {
-      throw new DomainException({
-        code: DomainExceptionCode.InternalServerError,
-        message: 'User does not exist',
-      });
-    }
-
-    const code = user.setConfirmationCode();
-
-    console.log('UsersService registration code', code);
-    if (!code) {
-      throw new DomainException({
-        code: DomainExceptionCode.BadRequest,
-        message: 'Email is already confirmed',
-        extensions: [{ message: 'Email is already confirmed', field: 'code' }],
-      });
-    }
-    await this.usersRepository.save(user);
-
-    console.log('UsersService registration user.email', user.email);
-
-    try {
-      console.log('UsersService registration emailService');
-      await this.emailService.sendConfirmationEmail(user.email, code);
-    } catch (e: unknown) {
-      console.log('ERROR', e);
-      throw new DomainException({
-        code: DomainExceptionCode.InternalServerError,
-        message: 'Send email error',
-      });
-    }
-  }
-
   async updateUser(
     id: Types.ObjectId,
     dto: UpdateUserDto,

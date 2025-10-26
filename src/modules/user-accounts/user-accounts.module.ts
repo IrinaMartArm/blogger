@@ -9,14 +9,35 @@ import { UsersQueryRepository } from './infrastructure/query/users.query-reposit
 import { ExternalUsersQueryRepository } from './infrastructure/external-query/external-users-query.repository';
 import { JwtStrategy } from './guards/bearer/jwt.strategy';
 import { PassportModule } from '@nestjs/passport';
-import { JwtModule } from '@nestjs/jwt';
+import { JwtModule, JwtService } from '@nestjs/jwt';
 import { LocalStrategy } from './guards/local/local.strategy';
 import { AuthController } from './api/auth.controller';
 import { AuthService } from './application/auth.service';
 import { NotificationsModule } from '../notifications/notifications.module';
 import { EmailService } from '../notifications/email.service';
 import { AuthQueryRepository } from './infrastructure/query/auth.query-repository';
+import { ConfirmRegistrationUseCase } from './application/useCases/confirmRegistration.use-case';
+import { RegistrationUseCase } from './application/useCases/registration.use-case';
+import { UserRegisteredHandler } from './application/events/userRegistered.event';
+import {
+  ACCESS_TOKEN_STRATEGY_INJECT_TOKEN,
+  REFRESH_TOKEN_STRATEGY_INJECT_TOKEN,
+} from './constants/token.constants';
+import { NewPasswordUseCase } from './application/useCases/new-password.use-case';
+import { EmailResendingUseCase } from './application/useCases/emailResending.use-case';
+import { PasswordRecoveryUseCase } from './application/useCases/passwordRecovery.use-case';
+import { LoginUseCase } from './application/useCases/login.use-case';
 // import { ConfigModule, ConfigService } from '@nestjs/config';
+
+const CommandHandlers = [
+  RegistrationUseCase,
+  LoginUseCase,
+  ConfirmRegistrationUseCase,
+  NewPasswordUseCase,
+  EmailResendingUseCase,
+  PasswordRecoveryUseCase,
+];
+const EventHandlers = [UserRegisteredHandler];
 
 @Module({
   imports: [
@@ -56,6 +77,32 @@ import { AuthQueryRepository } from './infrastructure/query/auth.query-repositor
     ExternalUsersQueryRepository,
     JwtStrategy,
     LocalStrategy,
+    ...CommandHandlers,
+    ...EventHandlers,
+    {
+      provide: ACCESS_TOKEN_STRATEGY_INJECT_TOKEN,
+      useFactory: (): JwtService => {
+        return new JwtService({
+          secret: 'access-token-secret', //TODO: move to env. will be in the following lessons
+          signOptions: { expiresIn: '5m' },
+        });
+      },
+      inject: [
+        /*TODO: inject configService. will be in the following lessons*/
+      ],
+    },
+    {
+      provide: REFRESH_TOKEN_STRATEGY_INJECT_TOKEN,
+      useFactory: (): JwtService => {
+        return new JwtService({
+          secret: 'refresh-token-secret', //TODO: move to env. will be in the following lessons
+          signOptions: { expiresIn: '10m' },
+        });
+      },
+      inject: [
+        /*TODO: inject configService. will be in the following lessons*/
+      ],
+    },
   ],
   exports: [ExternalUsersQueryRepository],
 })

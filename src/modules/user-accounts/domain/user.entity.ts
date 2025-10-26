@@ -5,6 +5,8 @@ import { UpdateUserDto } from '../dto/create-user.dto';
 import { Name, NameSchema } from './name.schema';
 import { randomUUID } from 'node:crypto';
 import { add } from 'date-fns';
+import { UserRegisteredEvent } from '../application/events/userRegistered.event';
+import { DomainEvent } from './event/domane.event';
 
 @Schema({ timestamps: true })
 export class User {
@@ -49,12 +51,14 @@ export class User {
   @Prop({ type: Date, nullable: true })
   deletedAt: Date | null;
 
+  private events: DomainEvent[] = [];
+
   static createInstance(dto: CreateUserDomainDto): UserDocument {
     const user = new this();
     user.email = dto.email;
     user.passwordHash = dto.passwordHash;
     user.login = dto.login;
-    user.isEmailConfirmed = false; // пользователь ВСЕГДА должен после регистрации подтверждить свой Email
+    user.isEmailConfirmed = false;
     user.deletedAt = null;
     // user.confirmationCode = randomUUID();
     // user.expirationDate = add(new Date(), { hours: 1, minutes: 30 });
@@ -138,13 +142,24 @@ export class User {
     this.expirationDate = add(new Date(), { hours: 1, minutes: 30 });
     this.isEmailConfirmed = false;
 
-    return code;
+    const event = new UserRegisteredEvent(this.email, code, passwordRecovery);
+    return { event, code };
+
+    // return code;
   }
 
   clearConfirmationCode(): void {
     this.isEmailConfirmed = true;
     this.confirmationCode = null;
     this.expirationDate = null;
+  }
+
+  getEvents(): DomainEvent[] {
+    return this.events;
+  }
+
+  clearEvents(): void {
+    this.events = [];
   }
 }
 

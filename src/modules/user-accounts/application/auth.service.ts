@@ -113,7 +113,7 @@ export class AuthService {
     await this.usersRepository.save(user);
 
     try {
-      await this.emailService.sendRecoveryEmail(user.email, code);
+      // await this.emailService.sendRecoveryEmail(user.email, code);
     } catch (e: unknown) {
       console.log('ERROR', e);
       // await usersRepository.deleteUser(userId);
@@ -178,7 +178,7 @@ export class AuthService {
     await this.usersRepository.save(user);
 
     try {
-      await this.emailService.sendConfirmationEmail(user.email, code);
+      // await this.emailService.sendConfirmationEmail(user.email, code);
     } catch (e: unknown) {
       console.log('ERROR', e);
       // await usersRepository.deleteUser(userId);
