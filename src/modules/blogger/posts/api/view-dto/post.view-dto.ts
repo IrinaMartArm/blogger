@@ -46,3 +46,22 @@ export class ExtendedLikesInfo {
   myStatus: string;
   newestLikes: NewestLikes[];
 }
+
+export type CommentatorInfo = {
+  userId: string;
+  userLogin: string;
+};
+
+export type LikesInfo = {
+  likesCount: number;
+  dislikesCount: number;
+  myStatus: string;
+};
+
+export type CommentViewDto = {
+  id: string;
+  content: string;
+  commentatorInfo: CommentatorInfo;
+  createdAt: string;
+  likesInfo: LikesInfo;
+};

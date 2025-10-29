@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Blog, BlogDocument, BlogModelType } from '../domain/blog.entity';
 import { InjectModel } from '@nestjs/mongoose';
+import { Types } from 'mongoose';
 
 @Injectable()
 export class BlogsRepository {
@@ -10,7 +11,7 @@ export class BlogsRepository {
     await blog.save();
   }
 
-  async findBlog(id: string): Promise<BlogDocument | null> {
+  async findBlog(id: string | Types.ObjectId): Promise<BlogDocument | null> {
     return this.blogModel.findOne({ _id: id, deletedAt: null });
   }
 }

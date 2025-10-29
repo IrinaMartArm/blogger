@@ -6,7 +6,8 @@ import { DomainExceptionCode } from '../../../../core/exceptions/domain-exceptio
 import { CreateUserDto } from '../../dto/create-user.dto';
 import { Types } from 'mongoose';
 import { BcryptService } from '../bcrypt.service';
-import { UserModelType } from '../../domain/user.entity';
+import { User, UserModelType } from '../../domain/user.entity';
+import { InjectModel } from '@nestjs/mongoose';
 
 export class RegistrationCommand {
   constructor(public dto: CreateUserInputDto) {}
@@ -17,8 +18,9 @@ export class RegistrationUseCase
   implements ICommandHandler<RegistrationCommand>
 {
   constructor(
-    private eventBus: EventBus,
+    @InjectModel(User.name)
     private UserModel: UserModelType,
+    private eventBus: EventBus,
     private readonly usersRepository: UsersRepository,
     private bcryptService: BcryptService,
   ) {}

@@ -1,13 +1,15 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { BlogViewDto } from '../api/view-dto/blog.view-dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Blog, BlogModelType } from '../domain/blog.entity';
 import { GetBlogsQueryParams } from '../api/input-dto/get-blogs-query-params.input-dto';
-import { FilterQuery, SortOrder } from 'mongoose';
+import { FilterQuery, SortOrder, Types } from 'mongoose';
 import { PaginatedViewDto } from '../../../../core/dto/base.paginated.view-dto';
 import { PostViewDto } from '../../posts/api/view-dto/post.view-dto';
 import { PostsQueryRepository } from '../../posts/infrastructure/posts-query.repository';
 import { PostsQueryParams } from '../../posts/api/input-dto/posts.input-dto';
+import { DomainException } from '../../../../core/exceptions/domain-exception';
+import { DomainExceptionCode } from '../../../../core/exceptions/domain-exception-codes';
 
 @Injectable()
 export class BlogsQueryRepository {
@@ -16,14 +18,17 @@ export class BlogsQueryRepository {
     private postsQueryRepository: PostsQueryRepository,
   ) {}
 
-  async getBlogById(id: string): Promise<BlogViewDto> {
+  async getBlogById(id: Types.ObjectId): Promise<BlogViewDto> {
     const blog = await this.BlogModel.findOne({
       _id: id,
       deletedAt: null,
     }).lean();
 
     if (!blog) {
-      throw new NotFoundException('blog not found');
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        message: 'No blog found.',
+      });
     }
 
     return BlogViewDto.mapToView(blog);
@@ -55,13 +60,21 @@ export class BlogsQueryRepository {
   }
 
   async findPosts(
-    blogId: string,
+    blogId: Types.ObjectId,
     query: PostsQueryParams,
+    currentUserId?: string,
   ): Promise<PaginatedViewDto<PostViewDto[]>> {
     const blogExists = await this.BlogModel.exists({ _id: blogId });
     if (!blogExists) {
-      throw new NotFoundException('blog not found');
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        message: 'No blog found',
+      });
     }
-    return this.postsQueryRepository.findPosts(query, blogId);
+    return this.postsQueryRepository.findPosts(
+      query,
+      currentUserId,
+      blogId.toString(),
+    );
   }
 }

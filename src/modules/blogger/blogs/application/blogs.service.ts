@@ -8,6 +8,9 @@ import { Blog, BlogModelType } from '../domain/blog.entity';
 import { BlogsRepository } from '../infrastructure/blogs.repository';
 import { CreatePostByBlogIdInputDto } from '../api/input-dto/post.input-dto';
 import { PostsService } from '../../posts/application/posts.service';
+import { DomainException } from '../../../../core/exceptions/domain-exception';
+import { DomainExceptionCode } from '../../../../core/exceptions/domain-exception-codes';
+import { Types } from 'mongoose';
 
 @Injectable()
 export class BlogsService {
@@ -19,26 +22,30 @@ export class BlogsService {
   async createBlog(body: CreateBlogInputDto) {
     const blog = this.BlogModel.createInstance(body);
     await this.blogRepository.save(blog);
-    return blog._id.toString();
+    return blog._id;
   }
 
   async update(id: string, body: UpdateBlogInputDto) {
     const blog = await this.blogRepository.findBlog(id);
     if (!blog) {
-      throw new NotFoundException();
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        message: 'No blog found.',
+      });
     }
     blog.update(body);
     return this.blogRepository.save(blog);
   }
 
-  async deleteBlog(id: string) {
+  async deleteBlog(id: Types.ObjectId) {
     const blog = await this.blogRepository.findBlog(id);
     if (!blog) {
-      throw new NotFoundException();
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        message: 'No blog found',
+      });
     }
     blog.makeDeleted();
-
-    console.log(blog.deletedAt);
 
     return this.blogRepository.save(blog);
   }

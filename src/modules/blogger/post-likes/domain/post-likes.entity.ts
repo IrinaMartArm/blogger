@@ -14,15 +14,36 @@ export class PostLike {
   status: LikeStatusValue;
 
   createdAt: Date;
+  deletedAt: Date | null;
 
-  static create(userId: string, postId: string, status: LikeStatusValue) {
+  static createInstance(
+    userId: string,
+    postId: string,
+    status: LikeStatusValue,
+  ) {
     const like = new this();
 
     like.userId = userId;
     like.postId = postId;
     like.status = status;
+    like.createdAt = new Date();
 
     return like as PostLikeDocument;
+  }
+
+  update(status: LikeStatusValue) {
+    if (status === LikeStatusValue.None) {
+      this.delete();
+    } else {
+      this.status = status;
+    }
+  }
+
+  delete() {
+    if (this.deletedAt) {
+      return;
+    }
+    this.deletedAt = new Date();
   }
 }
 

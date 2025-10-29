@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { LikeStatusValue } from '../../post-likes/dto';
-import { HydratedDocument, Model } from 'mongoose';
+import { HydratedDocument, Model, Types } from 'mongoose';
 
 @Schema({ timestamps: true })
 export class CommentLike {
@@ -14,8 +14,35 @@ export class CommentLike {
   status: LikeStatusValue;
 
   createdAt: Date;
+  deletedAt: Date | null;
 
-  static create() {}
+  static createInstance(
+    status: LikeStatusValue,
+    commentId: Types.ObjectId,
+    userId: string,
+  ) {
+    const like = new this();
+    like.commentId = commentId.toString();
+    like.userId = userId;
+    like.status = status;
+
+    return like as CommentLikeDocument;
+  }
+
+  update(status: LikeStatusValue) {
+    if (status === LikeStatusValue.None) {
+      this.delete();
+    } else {
+      this.status = status;
+    }
+  }
+
+  delete() {
+    if (this.deletedAt) {
+      return;
+    }
+    this.deletedAt = new Date();
+  }
 }
 
 export const CommentLikeSchema = SchemaFactory.createForClass(CommentLike);

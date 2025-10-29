@@ -5,8 +5,11 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Req,
+  Res,
   UseGuards,
 } from '@nestjs/common';
+import { Response, Request } from 'Express';
 import {
   CheckEmailDto,
   CreateUserInputDto,
@@ -44,8 +47,31 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   async login(
     @GetUserFromRequest() user: UserContextDto,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
   ): Promise<{ accessToken: string }> {
-    return this.commandBus.execute(new LoginCommand(user));
+    const ip =
+      req.ip ||
+      req.headers['x-forwarded-for']?.toString().split(',')[0].trim() ||
+      req.socket.remoteAddress ||
+      'unknown';
+    const deviseId: string =
+      req.headers['user-agent']?.toString() || 'Unknown device';
+
+    const { accessToken, refreshToken } = await this.commandBus.execute<
+      LoginCommand,
+      { accessToken: string; refreshToken: string }
+    >(new LoginCommand(user.currentUserId, ip, deviseId));
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: true, // true, если HTTPS
+      sameSite: 'strict', //чтобы токен не утекал на другие сайты
+      maxAge: 20 * 1000, //чтобы кука жила столько же, сколько refreshToken
+      path: '/', // путь, где кука будет доступна
+    });
+
+    return { accessToken };
   }
 
   @Get('me')

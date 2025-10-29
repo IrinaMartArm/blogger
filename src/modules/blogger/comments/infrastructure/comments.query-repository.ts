@@ -1,15 +1,16 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Comment, CommentModelType } from '../domain/comment.entity';
 import { InjectModel } from '@nestjs/mongoose';
 import {
   CommentsViewDto,
   CommentWithUserInfoDb,
 } from '../api/view-dto/comments.view-dto';
-import mongoose from 'mongoose';
-import { CommentLikesQueryRepository } from '../../comment-likes/infrastructure/comment-likes.repository';
+import mongoose, { Types } from 'mongoose';
 import { PaginatedViewDto } from '../../../../core/dto/base.paginated.view-dto';
 import { GetCommentsQueryParams } from '../../posts/api/input-dto/get-comments-query-params.input-dto';
-import { SortDirection } from '../../../../core/dto/base.query-params.input-dto';
+import { CommentLikesQueryRepository } from '../../comment-likes/infrastructure/comment-likes.query-repository';
+import { DomainException } from '../../../../core/exceptions/domain-exception';
+import { DomainExceptionCode } from '../../../../core/exceptions/domain-exception-codes';
 
 @Injectable()
 export class CommentsQueryRepository {
@@ -18,21 +19,27 @@ export class CommentsQueryRepository {
     private commentLikesQueryRepository: CommentLikesQueryRepository,
   ) {}
   async getComment(
-    commentId: string,
+    commentId: Types.ObjectId,
     userId?: string,
   ): Promise<CommentsViewDto> {
     const result: CommentWithUserInfoDb[] = await this.commentModel.aggregate([
       {
         $match: {
-          _id: new mongoose.Types.ObjectId(commentId),
+          _id: commentId,
           deletedAt: null,
         },
       },
       {
         $lookup: {
           from: 'users',
-          localField: 'userId',
-          foreignField: '_id',
+          let: { userIdStr: '$userId' },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ['$_id', { $toObjectId: '$$userIdStr' }] },
+              },
+            },
+          ],
           as: 'user',
         },
       },
@@ -56,14 +63,17 @@ export class CommentsQueryRepository {
     ]);
 
     if (result.length === 0) {
-      throw new NotFoundException('Comment not found');
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        message: 'not found',
+      });
     }
 
     const comment = result[0];
 
     const LikesInfo =
       await this.commentLikesQueryRepository.getLikesInfoForComment(
-        commentId,
+        commentId.toString(),
         userId,
       );
 
@@ -75,7 +85,6 @@ export class CommentsQueryRepository {
     query: GetCommentsQueryParams,
     userId?: string,
   ): Promise<PaginatedViewDto<CommentsViewDto[]>> {
-    const sortDirection = query.sortDirection === SortDirection.Asc ? 1 : -1;
     const filter = {
       postId: new mongoose.Types.ObjectId(postId),
       deletedAt: null,
@@ -88,8 +97,14 @@ export class CommentsQueryRepository {
       {
         $lookup: {
           from: 'users',
-          localField: 'userId',
-          foreignField: '_id',
+          let: { userIdStr: '$userId' },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ['$_id', { $toObjectId: '$$userIdStr' }] },
+              },
+            },
+          ],
           as: 'user',
         },
       },
@@ -100,13 +115,13 @@ export class CommentsQueryRepository {
         },
       },
       {
-        $sort: { [query.sortBy]: sortDirection }, // сортировка
+        $sort: { [query.sortBy]: query.sortDirection === 'asc' ? 1 : -1 },
       },
       {
-        $skip: query.calculateSkip(), // пагинация
+        $skip: query.calculateSkip(),
       },
       {
-        $limit: query.pageSize, // пагинация
+        $limit: query.pageSize,
       },
       {
         $project: {

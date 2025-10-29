@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Post, PostModelType } from '../domain/post.entity';
 import { ExtendedLikesInfo, PostViewDto } from '../api/view-dto/post.view-dto';
@@ -10,6 +10,8 @@ import { LikeStatusValue } from '../../post-likes/dto';
 import { CommentsViewDto } from '../../comments/api/view-dto/comments.view-dto';
 import { CommentsQueryRepository } from '../../comments/infrastructure/comments.query-repository';
 import { GetCommentsQueryParams } from '../api/input-dto/get-comments-query-params.input-dto';
+import { DomainException } from '../../../../core/exceptions/domain-exception';
+import { DomainExceptionCode } from '../../../../core/exceptions/domain-exception-codes';
 
 const defaultLikesInfo: ExtendedLikesInfo = {
   likesCount: 0,
@@ -31,7 +33,10 @@ export class PostsQueryRepository {
       .lean();
 
     if (!post) {
-      throw new NotFoundException();
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        message: 'Post not found',
+      });
     }
 
     const likesInfo = await this.postLikesRepository.getLikesInfoForPost(
@@ -44,8 +49,8 @@ export class PostsQueryRepository {
 
   async findPosts(
     query: PostsQueryParams,
-    blogId?: string,
     userId?: string,
+    blogId?: string,
   ): Promise<PaginatedViewDto<PostViewDto[]>> {
     const filter: FilterQuery<Post> = blogId
       ? {
@@ -63,7 +68,7 @@ export class PostsQueryRepository {
 
     const totalCount = await this.postModel.countDocuments(filter);
 
-    const ids = posts.map((post) => post._id);
+    const ids = posts.map((post) => post._id.toString());
     const postsWithLikes = await this.postLikesRepository.findPostsNewestLikes(
       ids,
       userId,
@@ -87,11 +92,19 @@ export class PostsQueryRepository {
   async getComments(
     postId: string,
     query: GetCommentsQueryParams,
+    currentUserId?: string,
   ): Promise<PaginatedViewDto<CommentsViewDto[]>> {
     const post = await this.postModel.exists({ _id: postId, deletedAt: null });
     if (!post) {
-      throw new NotFoundException('Post not found');
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        message: 'Post not found',
+      });
     }
-    return this.commentsQueryRepository.getCommentsForPost(postId, query);
+    return this.commentsQueryRepository.getCommentsForPost(
+      postId,
+      query,
+      currentUserId,
+    );
   }
 }

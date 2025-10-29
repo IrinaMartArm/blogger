@@ -7,7 +7,11 @@ import {
 } from '../../constants/token.constants';
 
 export class LoginCommand {
-  constructor(public readonly dto: { currentUserId: string }) {}
+  constructor(
+    public readonly currentUserId: string,
+    public readonly ip: string,
+    public readonly deviceId: string,
+  ) {}
 }
 
 @CommandHandler(LoginCommand)
@@ -19,18 +23,21 @@ export class LoginUseCase implements ICommandHandler<LoginCommand> {
     @Inject(REFRESH_TOKEN_STRATEGY_INJECT_TOKEN)
     private refreshTokenContext: JwtService,
   ) {}
-  execute({ dto }: LoginCommand): Promise<{ accessToken: string }> {
+  execute({
+    currentUserId,
+    ip,
+    deviceId,
+  }: LoginCommand): Promise<{ accessToken: string; refreshToken: string }> {
     const accessToken = this.accessTokenContext.sign({
-      id: dto.currentUserId,
+      currentUserId,
     });
 
     const refreshToken = this.refreshTokenContext.sign({
-      id: dto.currentUserId,
-      deviceId: 'deviceId',
+      currentUserId,
+      ip,
+      deviceId,
     });
 
-    console.log('refreshToken', refreshToken);
-
-    return Promise.resolve({ accessToken });
+    return Promise.resolve({ accessToken, refreshToken });
   }
 }

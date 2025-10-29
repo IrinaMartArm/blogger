@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Post, PostModelType } from '../domain/post.entity';
 import {
@@ -7,6 +7,8 @@ import {
 } from '../api/input-dto/posts.input-dto';
 import { BlogsRepository } from '../../blogs/infrastructure/blogs.repository';
 import { PostsRepository } from '../infrastructure/posts.repository';
+import { DomainException } from '../../../../core/exceptions/domain-exception';
+import { DomainExceptionCode } from '../../../../core/exceptions/domain-exception-codes';
 
 @Injectable()
 export class PostsService {
@@ -20,7 +22,10 @@ export class PostsService {
     const blog = await this.blogsRepository.findBlog(dto.blogId);
 
     if (!blog) {
-      throw new NotFoundException();
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        message: 'Blog not found',
+      });
     }
     const post = this.postModel.createInstance(dto, blog.name);
     await this.postsRepository.save(post);
@@ -30,13 +35,19 @@ export class PostsService {
   async updatePost(postId: string, dto: UpdatePostInputDto): Promise<void> {
     const post = await this.postsRepository.getPost(postId);
     if (!post) {
-      throw new NotFoundException('Post not found');
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        message: 'Post not found',
+      });
     }
 
     if (post.blogId !== dto.blogId) {
       const blog = await this.blogsRepository.findBlog(dto.blogId);
       if (!blog) {
-        throw new NotFoundException('Blog not found');
+        throw new DomainException({
+          code: DomainExceptionCode.NotFound,
+          message: 'Blog not found',
+        });
       }
       post.blogName = blog.name;
     }
@@ -46,11 +57,12 @@ export class PostsService {
   }
 
   async deletePost(postId: string): Promise<void> {
-    console.log('postId', postId);
     const post = await this.postsRepository.getPost(postId);
-    console.log('post', post?._id);
     if (!post) {
-      throw new NotFoundException('Post not found');
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        message: 'Post not found',
+      });
     }
     post.makeDeleted();
     return this.postsRepository.save(post);

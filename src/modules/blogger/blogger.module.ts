@@ -18,12 +18,28 @@ import {
 } from './post-likes/domain/post-likes.entity';
 import { CommentsController } from './comments/api/comments.controller';
 import { CommentsQueryRepository } from './comments/infrastructure/comments.query-repository';
-import { CommentLikesQueryRepository } from './comment-likes/infrastructure/comment-likes.repository';
+import { CommentLikesRepository } from './comment-likes/infrastructure/comment-likes.repository';
 import {
   CommentLike,
   CommentLikeSchema,
 } from './comment-likes/domain/comment-like.entity';
 import { Comment, CommentSchema } from './comments/domain/comment.entity';
+import { CommentsRepository } from './comments/infrastructure/comments.repository';
+import { DeleteCommentsUseCase } from './comments/application/use-cases/deleteComment.use-case';
+import { UpdateCommentUseCase } from './comments/application/use-cases/updateComment.use-case';
+import { SetPostLikeStatusUseCase } from './post-likes/applications/use-cases/set-post-like.use-case';
+import { PostLikesRepository } from './post-likes/infrastructure/post-likes.repository';
+import { CreateCommentUseCase } from './posts/application/use-cases/createComment.use-case';
+import { SetCommentLikeUseCase } from './comment-likes/application/use-cases/set-comment-like.use-case';
+import { CommentLikesQueryRepository } from './comment-likes/infrastructure/comment-likes.query-repository';
+
+const useCases = [
+  DeleteCommentsUseCase,
+  UpdateCommentUseCase,
+  SetPostLikeStatusUseCase,
+  CreateCommentUseCase,
+  SetCommentLikeUseCase,
+];
 
 @Module({
   imports: [
@@ -42,11 +58,15 @@ import { Comment, CommentSchema } from './comments/domain/comment.entity';
     PostsService,
     BlogsQueryRepository,
     PostsQueryRepository,
+    PostLikesRepository,
     CommentsQueryRepository,
+    CommentsRepository,
     CommentLikesQueryRepository,
+    CommentLikesRepository,
     BlogsRepository,
     PostsRepository,
     PostLikesQueryRepository,
+    ...useCases,
   ],
 })
 export class BloggerModule {}
