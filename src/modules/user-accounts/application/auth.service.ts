@@ -6,8 +6,6 @@ import { JwtService } from '@nestjs/jwt';
 import { LoginInputDto } from '../api/input-dto/login.input-gto';
 import { DomainException } from '../../../core/exceptions/domain-exception';
 import { DomainExceptionCode } from '../../../core/exceptions/domain-exception-codes';
-import { SETTINGS } from '../../../settings';
-import { EmailService } from '../../notifications/email.service';
 import { NewPasswordInputDto } from '../api/input-dto/users.input-dto';
 
 @Injectable()
@@ -16,7 +14,6 @@ export class AuthService {
     private readonly usersRepository: UsersRepository,
     private readonly bcryptService: BcryptService,
     private readonly jwtService: JwtService,
-    private readonly emailService: EmailService,
   ) {}
 
   async login(body: LoginInputDto): Promise<{ accessToken: string }> {
@@ -24,7 +21,7 @@ export class AuthService {
 
     const accessToken = this.jwtService.sign(
       { userId: user.currentUserId },
-      { secret: SETTINGS.JWT_ACCESS_SECRET },
+      { secret: 'secret' },
     );
 
     return {

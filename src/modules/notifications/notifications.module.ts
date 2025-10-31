@@ -1,27 +1,32 @@
 import { Module } from '@nestjs/common';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { EmailService } from './email.service';
-import { SETTINGS } from '../../settings';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
-    MailerModule.forRoot({
-      transport: {
-        host: 'smtp.gmail.com', //адрес SMTP сервера
-        port: 587,
-        secure: false,
-        requireTLS: true,
-        auth: {
-          user: SETTINGS.EMAIL,
-          pass: SETTINGS.PASS,
+    ConfigModule.forRoot(),
+    MailerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        transport: {
+          host: 'smtp.gmail.com',
+          port: 587,
+          secure: false,
+          requireTLS: true,
+          auth: {
+            user: configService.get<string>('EMAIL'),
+            pass: configService.get<string>('PASSWORD'),
+          },
         },
-      },
-      defaults: {
-        from: '"App" <irinasuperdev@gmail.com>',
-      },
+        defaults: {
+          from: `"App" <${configService.get<string>('MY_EMAIL')}>`,
+        },
+      }),
     }),
   ],
-  providers: [EmailService],
+  providers: [EmailService, ConfigService],
   exports: [EmailService],
 })
 export class NotificationsModule {}

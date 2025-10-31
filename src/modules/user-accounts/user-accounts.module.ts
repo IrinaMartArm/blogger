@@ -27,7 +27,7 @@ import { NewPasswordUseCase } from './application/useCases/new-password.use-case
 import { EmailResendingUseCase } from './application/useCases/emailResending.use-case';
 import { PasswordRecoveryUseCase } from './application/useCases/passwordRecovery.use-case';
 import { LoginUseCase } from './application/useCases/login.use-case';
-// import { ConfigModule, ConfigService } from '@nestjs/config';
+import { UserAccountsConfig } from './user-accounts.config';
 
 const CommandHandlers = [
   RegistrationUseCase,
@@ -44,29 +44,24 @@ const EventHandlers = [UserRegisteredHandler];
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     PassportModule,
     NotificationsModule,
-    //NestJS предоставляет модуль JwtModule (из пакета @nestjs/jwt), который нужен, чтобы:
-    // создавать токены (this.jwtService.sign(payload));
-    // проверять токены
-    //когда данные известны заранее:
-    JwtModule.register({
-      secret: '',
-      signOptions: { expiresIn: '10m' },
-    }),
+    JwtModule,
     //настройки берутся из других модулей, например из ConfigModule, чтобы не хардкодить значения.
     // JwtModule.registerAsync({
-    //   imports: [ConfigModule], перед регистрацией JwtModule нужно подключить ConfigModule,
-    // чтобы ConfigService был доступен внутри useFactory.
-    //   inject: [ConfigService], Указываем, что в функцию useFactory нужно «внедрить» экземпляр ConfigService.
+    //   imports: [ConfigModule], //перед регистрацией JwtModule нужно подключить ConfigModule,
+    //   //чтобы ConfigService был доступен внутри useFactory.
+    //   inject: [ConfigService], //Указываем, что в функцию useFactory нужно «внедрить» экземпляр ConfigService.
     //   useFactory: (cfg: ConfigService) => ({
-    //   secret: cfg.get<string>('JWT_SECRET'), достаём переменную окружения JWT_SECRET из .env через ConfigService
-    //   signOptions: { expiresIn: '1h' }, }),
-    //   фабричная функция — она вызывается при инициализации модуля.
-    // NestJS передаёт в неё ConfigService,
-    // и результат этой функции — объект настроек для JwtModule.
+    //     secret: cfg.get<string>('JWT_SECRET'), //достаём переменную окружения JWT_SECRET из .env через ConfigService
+    //     signOptions: { expiresIn: '1h' },
+    //   }),
+    //фабричная функция — она вызывается при инициализации модуля.
+    //NestJS передаёт в неё ConfigService,
+    //и результат этой функции — объект настроек для JwtModule.
     // }),
   ],
   controllers: [UsersController, AuthController],
   providers: [
+    UserAccountsConfig,
     UsersService,
     BcryptService,
     AuthService,
@@ -81,27 +76,23 @@ const EventHandlers = [UserRegisteredHandler];
     ...EventHandlers,
     {
       provide: ACCESS_TOKEN_STRATEGY_INJECT_TOKEN,
-      useFactory: (): JwtService => {
+      useFactory: (config: UserAccountsConfig): JwtService => {
         return new JwtService({
-          secret: 'access-token-secret', //TODO: move to env. will be in the following lessons
+          secret: config.accessTokenSecret,
           signOptions: { expiresIn: '5m' },
         });
       },
-      inject: [
-        /*TODO: inject configService. will be in the following lessons*/
-      ],
+      inject: [UserAccountsConfig],
     },
     {
       provide: REFRESH_TOKEN_STRATEGY_INJECT_TOKEN,
-      useFactory: (): JwtService => {
+      useFactory: (config: UserAccountsConfig): JwtService => {
         return new JwtService({
-          secret: 'refresh-token-secret', //TODO: move to env. will be in the following lessons
+          secret: config.refreshTokenSecret,
           signOptions: { expiresIn: '10m' },
         });
       },
-      inject: [
-        /*TODO: inject configService. will be in the following lessons*/
-      ],
+      inject: [UserAccountsConfig],
     },
   ],
   exports: [ExternalUsersQueryRepository],

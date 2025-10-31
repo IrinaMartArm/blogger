@@ -2,18 +2,21 @@ import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { UserContextDto } from '../../dto/user-context.dto';
-import { SETTINGS } from '../../../../settings';
 import { UsersRepository } from '../../infrastructure/users.repository';
 import { DomainException } from '../../../../core/exceptions/domain-exception';
 import { DomainExceptionCode } from '../../../../core/exceptions/domain-exception-codes';
+import { UserAccountsConfig } from '../../user-accounts.config';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
-  constructor(private readonly userRepo: UsersRepository) {
+  constructor(
+    private readonly userRepo: UsersRepository,
+    userAccountsConfig: UserAccountsConfig,
+  ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: SETTINGS.JWT_ACCESS_SECRET || '',
+      secretOrKey: userAccountsConfig.accessTokenSecret,
     });
   }
 

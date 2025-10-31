@@ -11,6 +11,9 @@ dependencies:
   '@nestjs/common':
     specifier: ^11.0.1
     version: 11.1.6(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+  '@nestjs/config':
+    specifier: ^4.0.2
+    version: 4.0.2(@nestjs/common@11.1.6)(rxjs@7.8.2)
   '@nestjs/core':
     specifier: ^11.0.1
     version: 11.1.6(@nestjs/common@11.1.6)(@nestjs/platform-express@11.1.6)(reflect-metadata@0.2.2)(rxjs@7.8.2)
@@ -47,9 +50,6 @@ dependencies:
   date-fns:
     specifier: ^4.1.0
     version: 4.1.0
-  dotenv:
-    specifier: ^17.2.3
-    version: 17.2.3
   mongoose:
     specifier: ^8.19.1
     version: 8.19.1
@@ -112,6 +112,9 @@ devDependencies:
   '@types/supertest':
     specifier: ^6.0.2
     version: 6.0.3
+  cross-env:
+    specifier: ^10.1.0
+    version: 10.1.0
   eslint:
     specifier: ^9.18.0
     version: 9.37.0
@@ -1157,6 +1160,10 @@ packages:
       '@css-inline/css-inline-win32-x64-msvc': 0.14.1
     dev: false
 
+  /@epic-web/invariant@1.0.0:
+    resolution: {integrity: sha512-lrTPqgvfFQtR/eY/qkIzp98OGdNJu0m5ji3q/nJI8v3SXkRKEnWiOxMmbvcSoAIzv/cGiuvRy57k4suKQSAdwA==}
+    dev: true
+
   /@eslint-community/eslint-utils@4.9.0(eslint@9.37.0):
     resolution: {integrity: sha512-ayVFHdtZ+hsq1t2Dy24wCmGXGe4q9Gu3smhLYALJrr473ZH27MsnSL+LKUlimp4BWJqMDMLmPpx/Q9R3OAlL4g==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
@@ -2087,6 +2094,19 @@ packages:
       uid: 2.0.2
     transitivePeerDependencies:
       - supports-color
+
+  /@nestjs/config@4.0.2(@nestjs/common@11.1.6)(rxjs@7.8.2):
+    resolution: {integrity: sha512-McMW6EXtpc8+CwTUwFdg6h7dYcBUpH5iUILCclAsa+MbCEvC9ZKu4dCHRlJqALuhjLw97pbQu62l4+wRwGeZqA==}
+    peerDependencies:
+      '@nestjs/common': ^10.0.0 || ^11.0.0
+      rxjs: ^7.1.0
+    dependencies:
+      '@nestjs/common': 11.1.6(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      dotenv: 16.4.7
+      dotenv-expand: 12.0.1
+      lodash: 4.17.21
+      rxjs: 7.8.2
+    dev: false
 
   /@nestjs/core@11.1.6(@nestjs/common@11.1.6)(@nestjs/platform-express@11.1.6)(reflect-metadata@0.2.2)(rxjs@7.8.2):
     resolution: {integrity: sha512-siWX7UDgErisW18VTeJA+x+/tpNZrJewjTBsRPF3JVxuWRuAB1kRoiJcxHgln8Lb5UY9NdvklITR84DUEXD0Cg==}
@@ -4489,6 +4509,15 @@ packages:
     resolution: {integrity: sha512-dcKFX3jn0MpIaXjisoRvexIJVEKzaq7z2rZKxf+MSr9TkdmHmsU4m2lcLojrj/FHl8mk5VxMmYA+ftRkP/3oKQ==}
     dev: true
 
+  /cross-env@10.1.0:
+    resolution: {integrity: sha512-GsYosgnACZTADcmEyJctkJIoqAhHjttw7RsFrVoJNXbsWWqaq6Ym+7kZjq6mS45O0jij6vtiReppKQEtqWy6Dw==}
+    engines: {node: '>=20'}
+    hasBin: true
+    dependencies:
+      '@epic-web/invariant': 1.0.0
+      cross-spawn: 7.0.6
+    dev: true
+
   /cross-spawn@6.0.6:
     resolution: {integrity: sha512-VqCUuhcd1iB+dsv8gxPttb5iZh/D0iubSP21g36KXdEuf6I5JiioesUVjpCdHV9MZRUfVFlvwtIUyPfxo5trtw==}
     engines: {node: '>=4.8'}
@@ -4723,8 +4752,15 @@ packages:
     dev: false
     optional: true
 
-  /dotenv@17.2.3:
-    resolution: {integrity: sha512-JVUnt+DUIzu87TABbhPmNfVdBDt18BLOWjMUFJMSi/Qqg7NTYtabbvSNJGOJ7afbRuv9D/lngizHtP7QyLQ+9w==}
+  /dotenv-expand@12.0.1:
+    resolution: {integrity: sha512-LaKRbou8gt0RNID/9RoI+J2rvXsBRPMV7p+ElHlPhcSARbCPDYcYG2s1TIzAfWv4YSgyY5taidWzzs31lNV3yQ==}
+    engines: {node: '>=12'}
+    dependencies:
+      dotenv: 16.4.7
+    dev: false
+
+  /dotenv@16.4.7:
+    resolution: {integrity: sha512-47qPchRCykZC03FhkYAhrvwU4xDBFIj1QPqaarj6mdM/hgUzfPHcpkHJOn3mJAufFeeAxAzeGsr5X0M4k6fLZQ==}
     engines: {node: '>=12'}
     dev: false
 
