@@ -24,10 +24,10 @@ import { PostViewDto } from '../../posts/api/view-dto/post.view-dto';
 import { PostsQueryParams } from '../../posts/api/input-dto/posts.input-dto';
 import { CreatePostByBlogIdInputDto } from './input-dto/post.input-dto';
 import { PostsQueryRepository } from '../../posts/infrastructure/posts-query.repository';
-import { BasicAuthGuard } from '../../../user-accounts/guards/basic/basic-auth.guard';
+import { BasicAuthGuard } from '../../../user-accounts/auth/guards/basic/basic-auth.guard';
 import { ObjectIdValidationPipe } from '../../../../core/pipes/objectId-validation.pipe';
 import { Types } from 'mongoose';
-import { OptionalJwtAuthGuard } from '../../../user-accounts/guards/bearer/optional-jwt-auth.guard';
+import { OptionalJwtAuthGuard } from '../../../user-accounts/auth/guards/bearer/optional-jwt-auth.guard';
 import { GetUserFromRequest } from '../../../user-accounts/decorators/param/getUserFromRequest';
 import { UserContextDto } from '../../../user-accounts/dto/user-context.dto';
 

@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { CommentsQueryRepository } from '../infrastructure/comments.query-repository';
 import { CommentsViewDto } from './view-dto/comments.view-dto';
-import { JwtAuthGuard } from '../../../user-accounts/guards/bearer/jwt-auth.guard';
+import { JwtAuthGuard } from '../../../user-accounts/auth/guards/bearer/jwt-auth.guard';
 import { CommandBus } from '@nestjs/cqrs';
 import { DeleteCommentCommand } from '../application/use-cases/deleteComment.use-case';
 import { ObjectIdValidationPipe } from '../../../../core/pipes/objectId-validation.pipe';
@@ -22,7 +22,7 @@ import { UserContextDto } from '../../../user-accounts/dto/user-context.dto';
 import { Types } from 'mongoose';
 import { SetCommentLikeCommand } from '../../comment-likes/application/use-cases/set-comment-like.use-case';
 import { LikeInputDto } from '../../post-likes/dto';
-import { OptionalJwtAuthGuard } from '../../../user-accounts/guards/bearer/optional-jwt-auth.guard';
+import { OptionalJwtAuthGuard } from '../../../user-accounts/auth/guards/bearer/optional-jwt-auth.guard';
 
 @Controller('comments')
 export class CommentsController {

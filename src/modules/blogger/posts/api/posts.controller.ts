@@ -23,8 +23,8 @@ import { PostsQueryRepository } from '../infrastructure/posts-query.repository';
 import { PaginatedViewDto } from '../../../../core/dto/base.paginated.view-dto';
 import { CommentsViewDto } from '../../comments/api/view-dto/comments.view-dto';
 import { GetCommentsQueryParams } from './input-dto/get-comments-query-params.input-dto';
-import { BasicAuthGuard } from '../../../user-accounts/guards/basic/basic-auth.guard';
-import { JwtAuthGuard } from '../../../user-accounts/guards/bearer/jwt-auth.guard';
+import { BasicAuthGuard } from '../../../user-accounts/auth/guards/basic/basic-auth.guard';
+import { JwtAuthGuard } from '../../../user-accounts/auth/guards/bearer/jwt-auth.guard';
 import { GetUserFromRequest } from '../../../user-accounts/decorators/param/getUserFromRequest';
 import { UserContextDto } from '../../../user-accounts/dto/user-context.dto';
 import { CommandBus } from '@nestjs/cqrs';
@@ -33,7 +33,7 @@ import { ObjectIdValidationPipe } from '../../../../core/pipes/objectId-validati
 import { LikeInputDto } from '../../post-likes/dto';
 import { Types } from 'mongoose';
 import { SetPostLikeStatusCommand } from '../../post-likes/applications/use-cases/set-post-like.use-case';
-import { OptionalJwtAuthGuard } from '../../../user-accounts/guards/bearer/optional-jwt-auth.guard';
+import { OptionalJwtAuthGuard } from '../../../user-accounts/auth/guards/bearer/optional-jwt-auth.guard';
 import { CommentsQueryRepository } from '../../comments/infrastructure/comments.query-repository';
 
 @Controller('posts')

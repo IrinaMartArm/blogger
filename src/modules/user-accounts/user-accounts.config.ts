@@ -8,12 +8,12 @@ export class UserAccountsConfig {
   @IsNotEmpty({
     message: 'Set Env variable ACCESS_TOKEN_EXPIRE_IN, examples: 1h, 5m, 2d',
   })
-  accessTokenExpireIn: string;
+  accessTokenExpireIn: `${number}${'s' | 'm' | 'h' | 'd'}` | number;
 
   @IsNotEmpty({
     message: 'Set Env variable REFRESH_TOKEN_EXPIRE_IN, examples: 1h, 5m, 2d',
   })
-  refreshTokenExpireIn: string;
+  refreshTokenExpireIn: `${number}${'s' | 'm' | 'h' | 'd'}` | number;
 
   @IsNotEmpty({
     message: 'Set Env variable REFRESH_TOKEN_SECRET, dangerous for security!',
@@ -30,8 +30,12 @@ export class UserAccountsConfig {
     this.refreshTokenExpireIn = this.configService.get(
       'REFRESH_TOKEN_EXPIRE_IN',
     );
-    this.accessTokenSecret = this.configService.get('ACCESS_TOKEN_SECRET');
-    this.refreshTokenSecret = this.configService.get('REFRESH_TOKEN_SECRET');
+    this.accessTokenSecret =
+      this.configService.get('ACCESS_TOKEN_SECRET') ?? 'defaultAccessSecret';
+    this.refreshTokenSecret =
+      this.configService.get('REFRESH_TOKEN_SECRET') ?? 'defaultRefreshSecret';
+
+    console.log('CoreConfig.ACCESS_TOKEN_SECRET:', this.accessTokenSecret);
 
     configValidationUtility.validateConfig(this);
   }

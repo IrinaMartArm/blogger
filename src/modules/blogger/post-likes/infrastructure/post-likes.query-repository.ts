@@ -11,9 +11,9 @@ import {
   NewestLikesDb,
 } from '../../posts/api/view-dto/post.view-dto';
 import { LikeStatusValue } from '../dto';
-import { ExternalUsersQueryRepository } from '../../../user-accounts/infrastructure/external-query/external-users-query.repository';
-import mongoose, { Types } from 'mongoose';
+import mongoose from 'mongoose';
 import { GetPostsResult } from '../../posts/dto';
+import { ExternalUsersQueryRepository } from '../../../user-accounts/user/infrastructure/external-query/external-users-query.repository';
 
 @Injectable()
 export class PostLikesQueryRepository {
