@@ -16,20 +16,35 @@ export class DevicesRepository {
     await device.save();
   }
 
-  async deleteDevice(deviceId: string, userId: string): Promise<boolean> {
-    const result = await this.deviceModel.deleteOne({ deviceId, userId });
+  async findDeviceById(deviceId: string): Promise<DeviceDocument | null> {
+    return this.deviceModel.findOne({ deviceId });
+  }
+
+  async deleteDevice(
+    deviceId: string,
+    userId: string,
+    jti: string,
+  ): Promise<boolean> {
+    const result = await this.deviceModel.deleteOne({ deviceId, userId, jti });
     return result.deletedCount > 0;
   }
 
-  async deleteAllDevices(userId: string): Promise<boolean> {
-    const result = await this.deviceModel.deleteMany({ userId });
+  async deleteAllDevices(
+    userId: string,
+    currentDeviceId: string,
+  ): Promise<boolean> {
+    const result = await this.deviceModel.deleteMany({
+      userId,
+      deviceId: { $ne: currentDeviceId },
+    });
     return result.deletedCount > 0;
   }
 
   async getSession(
     deviceId: string,
     userId: string,
+    jti: string,
   ): Promise<DeviceDocument | null> {
-    return this.deviceModel.findOne({ deviceId, userId });
+    return this.deviceModel.findOne({ deviceId, userId, jti });
   }
 }

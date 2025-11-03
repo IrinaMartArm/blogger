@@ -9,9 +9,10 @@ import { DecodedRefreshToken } from '../../api/input-dto/login.input-dto';
 import { DevicesRepository } from '../../../security-devices/infrastructure/devices.repository';
 import { DomainException } from '../../../../../core/exceptions/domain-exception';
 import { DomainExceptionCode } from '../../../../../core/exceptions/domain-exception-codes';
+import { randomUUID } from 'node:crypto';
 
 export class RefreshTokenCommand {
-  constructor(public readonly oldRefreshToken: string) {}
+  constructor(public readonly payload: DecodedRefreshToken) {}
 }
 
 @CommandHandler(RefreshTokenCommand)
@@ -25,61 +26,44 @@ export class RefreshTokenUseCase
     private readonly accessTokenService: JwtService,
     private readonly devicesRepository: DevicesRepository,
   ) {}
-  async execute({ oldRefreshToken }: RefreshTokenCommand): Promise<{
+  async execute({ payload }: RefreshTokenCommand): Promise<{
     accessToken: string;
     refreshToken: string;
   }> {
-    console.log('oldRefreshToken:', oldRefreshToken);
+    const { currentUserId, deviceId, ip, jti } = payload;
 
-    try {
-      const decoded: DecodedRefreshToken =
-        this.refreshTokenContext.verify(oldRefreshToken);
+    const session = await this.devicesRepository.getSession(
+      deviceId,
+      currentUserId,
+      jti,
+    );
 
-      if (!decoded?.deviceId || !decoded?.currentUserId) {
-        throw new DomainException({
-          code: DomainExceptionCode.Unauthorized,
-          message: 'Invalid refresh token payload',
-        });
-      }
-
-      const { currentUserId, deviceId, ip } = decoded;
-
-      const session = await this.devicesRepository.getSession(
-        deviceId,
-        currentUserId,
-      );
-
-      console.log('session:', session);
-
-      if (!session) {
-        throw new DomainException({
-          code: DomainExceptionCode.Unauthorized,
-          message: 'Unauthorized',
-        });
-      }
-
-      const accessToken = this.accessTokenService.sign({ currentUserId });
-
-      const refreshToken = this.refreshTokenContext.sign({
-        currentUserId,
-        deviceId,
-        ip,
-      });
-
-      const decodedRefreshToken: DecodedRefreshToken =
-        this.refreshTokenContext.decode(refreshToken);
-
-      const expiresAt = new Date(decodedRefreshToken.exp * 1000);
-
-      session.updateSession(expiresAt);
-      await this.devicesRepository.save(session);
-
-      return { accessToken, refreshToken };
-    } catch {
+    if (!session) {
       throw new DomainException({
         code: DomainExceptionCode.Unauthorized,
-        message: 'Invalid or expired refresh token',
+        message: 'Unauthorized',
       });
     }
+
+    const newJti = randomUUID();
+
+    const accessToken = this.accessTokenService.sign({ currentUserId });
+
+    const refreshToken = this.refreshTokenContext.sign({
+      currentUserId,
+      deviceId,
+      jti: newJti,
+      ip,
+    });
+
+    const decodedRefreshToken: DecodedRefreshToken =
+      this.refreshTokenContext.decode(refreshToken);
+
+    const expiresAt = new Date(decodedRefreshToken.exp * 1000);
+
+    session.updateSession(expiresAt, newJti);
+    await this.devicesRepository.save(session);
+
+    return { accessToken, refreshToken };
   }
 }

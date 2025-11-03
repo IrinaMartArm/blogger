@@ -16,6 +16,7 @@ export class ConfirmCodeDto {
 export interface DecodedRefreshToken {
   currentUserId: string;
   deviceId: string;
+  jti: string;
   ip: string;
   iat: number;
   exp: number; // ← Автоматически! Время истечения (expiration)

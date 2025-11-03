@@ -4,21 +4,6 @@ import { DomainExceptionCode } from '../../../../../core/exceptions/domain-excep
 import { ExecutionContext, Injectable } from '@nestjs/common';
 import { Request } from 'Express';
 
-// @Injectable()
-// export class OptionalJwtAuthGuard extends AuthGuard('jwt') {
-//   handleRequest<UserContextDto>(
-//     err: unknown,
-//     user: UserContextDto | false | null,
-//   ): UserContextDto | null {
-//     if (err) {
-//       throw new DomainException({
-//         code: DomainExceptionCode.InternalServerError,
-//         message: 'Error while validating token',
-//       });
-//     }
-//     return user || null;
-//   }
-// }
 @Injectable()
 export class OptionalJwtAuthGuard extends AuthGuard('jwt') {
   handleRequest<UserContextDto>(

@@ -3,10 +3,13 @@ import { AppModule } from './app.module';
 import { appSetup } from './setup/app.setup';
 import { CoreConfig } from './core/core.config';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   appSetup(app);
+
+  app.use(cookieParser());
 
   app.set('trust proxy', true); //'loopback' означает доверять только локальным прокси, то есть 127.0.0.1 и ::1.
   //1 — доверять первому прокси (если у тебя один внешний прокси перед приложением, например Nginx).

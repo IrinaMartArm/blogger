@@ -9,8 +9,11 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { Response, Request } from 'express';
-import { ConfirmCodeDto } from './input-dto/login.input-dto';
+import { Request, Response } from 'express';
+import {
+  ConfirmCodeDto,
+  DecodedRefreshToken,
+} from './input-dto/login.input-dto';
 import { GetUserFromRequest } from '../../decorators/param/getUserFromRequest';
 import { UserContextDto } from '../../dto/user-context.dto';
 import { JwtAuthGuard } from '../guards/bearer/jwt-auth.guard';
@@ -34,6 +37,7 @@ import { DomainException } from '../../../../core/exceptions/domain-exception';
 import { DomainExceptionCode } from '../../../../core/exceptions/domain-exception-codes';
 import { RefreshTokenCommand } from '../application/useCases/refresh-token.use-case';
 import { LogoutCommand } from '../application/useCases/logout.use-case';
+import { RefreshTokenGuard } from '../guards/bearer/refresh-token-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -58,7 +62,6 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ): Promise<{ accessToken: string }> {
-    console.log('login');
     const ip =
       req.ip ||
       req.headers['x-forwarded-for']?.toString().split(',')[0].trim() ||
@@ -89,25 +92,25 @@ export class AuthController {
     return this.queryBus.execute(new GetMeQuery(user.currentUserId));
   }
 
-  @Get('refresh-token')
+  @Post('refresh-token')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(RefreshTokenGuard)
   async refreshTokens(
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ): Promise<{ accessToken: string }> {
-    const cookies = req.cookies as { refreshToken?: string } | undefined;
-    const oldRefreshToken = cookies?.refreshToken;
-
-    if (!oldRefreshToken) {
+    const payload = req.user as DecodedRefreshToken;
+    if (!payload) {
       throw new DomainException({
         code: DomainExceptionCode.Unauthorized,
-        message: 'Refresh token not found',
+        message: 'Unauthorized',
       });
     }
 
     const { accessToken, refreshToken } = await this.commandBus.execute<
       RefreshTokenCommand,
       { accessToken: string; refreshToken: string }
-    >(new RefreshTokenCommand(oldRefreshToken));
+    >(new RefreshTokenCommand(payload));
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
@@ -120,26 +123,26 @@ export class AuthController {
   }
 
   @Post('logout')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(RefreshTokenGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async logout(@Req() req: Request, @Res() res: Response): Promise<void> {
-    const cookies = req.cookies as { refreshToken?: string } | undefined;
-    const refreshToken = cookies?.refreshToken;
+    const payload = req.user as DecodedRefreshToken;
 
-    if (!refreshToken) {
+    if (!payload) {
       throw new DomainException({
         code: DomainExceptionCode.Unauthorized,
         message: 'Refresh token not found',
       });
     }
 
-    await this.commandBus.execute(new LogoutCommand(refreshToken));
+    await this.commandBus.execute(new LogoutCommand(payload));
 
     res.clearCookie('refreshToken', {
       httpOnly: true,
       secure: true,
       sameSite: 'strict',
     });
+    res.status(HttpStatus.NO_CONTENT).send();
   }
 
   @Post('registration-confirmation')

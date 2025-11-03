@@ -11,6 +11,9 @@ export class Device {
   deviceId: string;
 
   @Prop({ type: String, required: true })
+  jti: string;
+
+  @Prop({ type: String, required: true })
   ip: string;
 
   @Prop({ type: String, required: true })
@@ -27,6 +30,7 @@ export class Device {
 
     device.userId = dto.userId;
     device.deviceId = dto.deviceId;
+    device.jti = dto.jti;
     device.ip = dto.ip;
     device.userAgent = dto.userAgent;
     device.expiresAt = dto.expiresAt;
@@ -35,8 +39,9 @@ export class Device {
     return device as DeviceDocument;
   }
 
-  updateSession(expiresAt: Date) {
+  updateSession(expiresAt: Date, jti: string) {
     this.expiresAt = expiresAt;
+    this.jti = jti;
     this.lastActive = new Date();
   }
 }

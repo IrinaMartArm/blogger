@@ -8,6 +8,9 @@ export class DeviceInputDto {
   deviceId: string;
 
   @IsString()
+  jti: string;
+
+  @IsString()
   ip: string;
 
   @IsString()

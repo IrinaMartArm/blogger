@@ -38,6 +38,7 @@ export class LoginUseCase implements ICommandHandler<LoginCommand> {
     userAgent,
   }: LoginCommand): Promise<{ accessToken: string; refreshToken: string }> {
     const deviceId = randomUUID();
+    const jti = randomUUID();
 
     const accessToken = this.accessTokenContext.sign({
       currentUserId,
@@ -46,6 +47,7 @@ export class LoginUseCase implements ICommandHandler<LoginCommand> {
     const refreshToken = this.refreshTokenContext.sign({
       currentUserId,
       deviceId,
+      jti,
       ip,
     });
 
@@ -56,6 +58,7 @@ export class LoginUseCase implements ICommandHandler<LoginCommand> {
     const device = this.deviceModel.createInstance({
       userId: currentUserId,
       deviceId,
+      jti,
       ip,
       userAgent,
       lastActive: new Date(),

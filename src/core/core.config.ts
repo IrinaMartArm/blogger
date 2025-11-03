@@ -67,17 +67,16 @@ export class CoreConfig {
     this.env = this.configService.get('NODE_ENV');
     this.refreshTokenSecret = this.configService.get('REFRESH_TOKEN_SECRET');
     this.accessTokenSecret = this.configService.get('ACCESS_TOKEN_SECRET');
-    this.includeTestingModule =
-      (configValidationUtility.convertToBoolean(
-        this.configService.get('INCLUDE_TESTING_MODULE'),
-      ) as boolean) || true;
+    this.includeTestingModule = configValidationUtility.convertToBoolean(
+      this.configService.get('INCLUDE_TESTING_MODULE'),
+    ) as boolean;
     this.isSwaggerEnabled = configValidationUtility.convertToBoolean(
       this.configService.get('IS_SWAGGER_ENABLED'),
     ) as boolean;
     this.sendInternalServerErrorDetails =
-      (configValidationUtility.convertToBoolean(
+      configValidationUtility.convertToBoolean(
         this.configService.get('SEND_INTERNAL_SERVER_ERROR_DETAILS'),
-      ) as boolean) || false;
+      ) as boolean;
 
     configValidationUtility.validateConfig(this);
   }

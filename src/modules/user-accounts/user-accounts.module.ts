@@ -43,8 +43,11 @@ import { GetMeHandler } from './auth/infrastructure/query/get-me.query';
 import { CreateUserUseCase } from './user/application/useCases/create-user.use-case';
 import { GetUserQueryUseCase } from './user/infrastructure/query/get-user.query';
 import { CqrsModule } from '@nestjs/cqrs';
+import { JwtRefreshStrategy } from './auth/guards/bearer/refresh.strategy';
+import { LogoutUseCase } from './auth/application/useCases/logout.use-case';
 
 const CommandHandlers = [
+  LogoutUseCase,
   ConfirmRegistrationUseCase,
   EmailResendingUseCase,
   LoginUseCase,
@@ -103,6 +106,7 @@ const QueryHandlers = [
     ExternalUsersQueryRepository,
     JwtStrategy,
     LocalStrategy,
+    JwtRefreshStrategy,
     ...CommandHandlers,
     ...EventHandlers,
     ...QueryHandlers,

@@ -17,7 +17,28 @@ export class DeleteDevicesUseCase
   constructor(private readonly devicesRepository: DevicesRepository) {}
 
   async execute({ deviceId, userId }: DeleteDeviceCommand): Promise<void> {
-    const result = await this.devicesRepository.deleteDevice(deviceId, userId);
+    const device = await this.devicesRepository.findDeviceById(deviceId);
+
+    if (!device) {
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        message: 'Device id not found',
+      });
+    }
+
+    if (device.userId.toString() !== userId) {
+      throw new DomainException({
+        code: DomainExceptionCode.Forbidden,
+        message: 'User not owner',
+      });
+    }
+
+    const result = await this.devicesRepository.deleteDevice(
+      deviceId,
+      userId,
+      device.jti,
+    );
+
     if (!result) {
       throw new DomainException({
         code: DomainExceptionCode.NotFound,

@@ -12,7 +12,7 @@ export class DevicesViewDto {
     device.deviceId = dto.deviceId;
     device.ip = dto.ip;
     device.title = dto.userAgent;
-    device.lastActiveDate = dto.lastActive.toString();
+    device.lastActiveDate = dto.lastActive.toISOString();
 
     return device;
   }
