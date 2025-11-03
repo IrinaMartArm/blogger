@@ -30,12 +30,8 @@ export class UserAccountsConfig {
     this.refreshTokenExpireIn = this.configService.get(
       'REFRESH_TOKEN_EXPIRE_IN',
     );
-    this.accessTokenSecret =
-      this.configService.get('ACCESS_TOKEN_SECRET') ?? 'defaultAccessSecret';
-    this.refreshTokenSecret =
-      this.configService.get('REFRESH_TOKEN_SECRET') ?? 'defaultRefreshSecret';
-
-    console.log('CoreConfig.ACCESS_TOKEN_SECRET:', this.accessTokenSecret);
+    this.accessTokenSecret = this.configService.get('ACCESS_TOKEN_SECRET');
+    this.refreshTokenSecret = this.configService.get('REFRESH_TOKEN_SECRET');
 
     configValidationUtility.validateConfig(this);
   }

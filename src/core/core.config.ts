@@ -33,15 +33,15 @@ export class CoreConfig {
   })
   env: string;
 
-  @IsNotEmpty({
-    message: 'Set Env variable REFRESH_TOKEN_SECRET, dangerous for security!',
-  })
-  refreshTokenSecret: string;
-
-  @IsNotEmpty({
-    message: 'Set Env variable ACCESS_TOKEN_SECRET, dangerous for security!',
-  })
-  accessTokenSecret: string;
+  // @IsNotEmpty({
+  //   message: 'Set Env variable REFRESH_TOKEN_SECRET, dangerous for security!',
+  // })
+  // refreshTokenSecret: string;
+  //
+  // @IsNotEmpty({
+  //   message: 'Set Env variable ACCESS_TOKEN_SECRET, dangerous for security!',
+  // })
+  // accessTokenSecret: string;
 
   @IsBoolean({
     message:
@@ -65,8 +65,8 @@ export class CoreConfig {
     this.port = Number(this.configService.get('PORT'));
     this.mongoURI = this.configService.get('MONGO_URI');
     this.env = this.configService.get('NODE_ENV');
-    this.refreshTokenSecret = this.configService.get('REFRESH_TOKEN_SECRET');
-    this.accessTokenSecret = this.configService.get('ACCESS_TOKEN_SECRET');
+    // this.refreshTokenSecret = this.configService.get('REFRESH_TOKEN_SECRET');
+    // this.accessTokenSecret = this.configService.get('ACCESS_TOKEN_SECRET');
     this.includeTestingModule = configValidationUtility.convertToBoolean(
       this.configService.get('INCLUDE_TESTING_MODULE'),
     ) as boolean;

@@ -4,7 +4,7 @@ import { CoreConfig } from './core.config';
 @Global()
 @Module({
   imports: [],
-  exports: [CoreConfig],
   providers: [CoreConfig],
+  exports: [CoreConfig],
 })
 export class CoreModule {}

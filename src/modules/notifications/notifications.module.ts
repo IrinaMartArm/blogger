@@ -21,7 +21,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
           },
         },
         defaults: {
-          from: `"App" <${configService.get<string>('MY_EMAIL')}>`,
+          from: `"App" <${configService.get<string>('EMAIL')}>`,
         },
       }),
     }),

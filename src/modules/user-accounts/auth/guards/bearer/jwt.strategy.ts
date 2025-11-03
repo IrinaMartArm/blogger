@@ -23,8 +23,6 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   async validate(payload: UserContextDto): Promise<UserContextDto> {
     const user = await this.userRepo.findById(payload.currentUserId);
 
-    console.log('ACCESS_TOKEN_SECRET:', this.config.accessTokenSecret);
-
     if (!user) {
       throw new DomainException({
         code: DomainExceptionCode.Unauthorized,
